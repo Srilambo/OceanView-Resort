@@ -16,13 +16,19 @@ public class ReservationServiceTest {
     private Room testRoom;
 
     @BeforeEach
-    public void setUp() {
-        testGuest = new Guest("G1", "John Doe", "john@test.com", "1234567890", "123 Street", "ABC123");
-        testRoom = new Room("R1", "101", "Double", 2, BigDecimal.valueOf(150), "Ocean view", true);
+    public void setUp() throws Exception {
+        String randomId = java.util.UUID.randomUUID().toString().substring(0, 8);
+        testGuest = new Guest("G-" + randomId, "John Doe", "john" + randomId + "@test.com", "1234567890", "123 Street",
+                "ABC123");
+        testRoom = new Room("R-" + randomId, "RM-" + randomId, "Double", 2, BigDecimal.valueOf(150), "Ocean view",
+                true);
+
         GuestRepository guestRepo = new GuestRepository();
         guestRepo.save(testGuest);
+
         RoomRepository roomRepo = new RoomRepository();
         roomRepo.save(testRoom);
+
         service = new ReservationService();
     }
 

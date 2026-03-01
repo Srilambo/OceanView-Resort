@@ -1,71 +1,153 @@
 package com.oceanview.repository;
 
 import com.oceanview.model.Room;
-import com.oceanview.util.FileHandler;
+import com.oceanview.db.DatabaseHelper;
+import java.sql.*;
 import java.util.*;
 
 public class RoomRepository {
-    private static final String ROOMS_FILE = "resources/data/rooms.dat";
-    private List<Room> rooms;
 
-    public RoomRepository() {
-        this.rooms = FileHandler.loadRooms(ROOMS_FILE);
-    }
+    public Room save(Room room) throws SQLException {
+        String sql = "INSERT INTO rooms (room_id, room_number, room_type, capacity, " +
+                "price_per_night, description, available) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    public Room save(Room room) {
-        if (room.getRoomId() == null) {
-            room.setRoomId(UUID.randomUUID().toString());
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, room.getRoomId());
+            pstmt.setString(2, room.getRoomNumber());
+            pstmt.setString(3, room.getRoomType());
+            pstmt.setInt(4, room.getCapacity());
+            pstmt.setBigDecimal(5, room.getPricePerNight());
+            pstmt.setString(6, room.getDescription());
+            pstmt.setBoolean(7, room.isAvailable());
+
+            pstmt.executeUpdate();
+            return room;
         }
-        rooms.add(room);
-        FileHandler.saveRooms(ROOMS_FILE, rooms);
-        return room;
     }
 
-    public Room findById(String roomId) {
-        return rooms.stream()
-            .filter(r -> r.getRoomId().equals(roomId))
-            .findFirst()
-            .orElse(null);
-    }
+    public Room findById(String roomId) throws SQLException {
+        String sql = "SELECT * FROM rooms WHERE room_id = ?";
 
-    public Room findByRoomNumber(String roomNumber) {
-        return rooms.stream()
-            .filter(r -> r.getRoomNumber().equals(roomNumber))
-            .findFirst()
-            .orElse(null);
-    }
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-    public List<Room> findByAvailable(boolean available) {
-        List<Room> result = new ArrayList<>();
-        for (Room r : rooms) {
-            if (r.isAvailable() == available) {
-                result.add(r);
+            pstmt.setString(1, roomId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return mapResultSetToRoom(rs);
             }
         }
-        return result;
+        return null;
     }
 
-    public List<Room> findByRoomType(String roomType) {
-        List<Room> result = new ArrayList<>();
-        for (Room r : rooms) {
-            if (r.getRoomType().equalsIgnoreCase(roomType)) {
-                result.add(r);
+    public Room findByRoomNumber(String roomNumber) throws SQLException {
+        String sql = "SELECT * FROM rooms WHERE room_number = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, roomNumber);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return mapResultSetToRoom(rs);
             }
         }
-        return result;
+        return null;
     }
 
-    public List<Room> findAll() {
-        return new ArrayList<>(rooms);
-    }
+    public List<Room> findByAvailable(boolean available) throws SQLException {
+        String sql = "SELECT * FROM rooms WHERE available = ?";
+        List<Room> rooms = new ArrayList<>();
 
-    public Room update(Room room) {
-        Room existing = findById(room.getRoomId());
-        if (existing != null) {
-            rooms.remove(existing);
-            rooms.add(room);
-            FileHandler.saveRooms(ROOMS_FILE, rooms);
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setBoolean(1, available);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                rooms.add(mapResultSetToRoom(rs));
+            }
         }
-        return room;
+        return rooms;
+    }
+
+    public List<Room> findByRoomType(String roomType) throws SQLException {
+        String sql = "SELECT * FROM rooms WHERE room_type = ?";
+        List<Room> rooms = new ArrayList<>();
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, roomType);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                rooms.add(mapResultSetToRoom(rs));
+            }
+        }
+        return rooms;
+    }
+
+    public List<Room> findAll() throws SQLException {
+        String sql = "SELECT * FROM rooms";
+        List<Room> rooms = new ArrayList<>();
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                rooms.add(mapResultSetToRoom(rs));
+            }
+        }
+        return rooms;
+    }
+
+    public Room update(Room room) throws SQLException {
+        String sql = "UPDATE rooms SET room_number = ?, room_type = ?, capacity = ?, " +
+                "price_per_night = ?, description = ?, available = ? WHERE room_id = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, room.getRoomNumber());
+            pstmt.setString(2, room.getRoomType());
+            pstmt.setInt(3, room.getCapacity());
+            pstmt.setBigDecimal(4, room.getPricePerNight());
+            pstmt.setString(5, room.getDescription());
+            pstmt.setBoolean(6, room.isAvailable());
+            pstmt.setString(7, room.getRoomId());
+
+            pstmt.executeUpdate();
+            return room;
+        }
+    }
+
+    public boolean delete(String roomId) throws SQLException {
+        String sql = "DELETE FROM rooms WHERE room_id = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, roomId);
+            int result = pstmt.executeUpdate();
+            return result > 0;
+        }
+    }
+
+    private Room mapResultSetToRoom(ResultSet rs) throws SQLException {
+        return new Room(
+                rs.getString("room_id"),
+                rs.getString("room_number"),
+                rs.getString("room_type"),
+                rs.getInt("capacity"),
+                rs.getBigDecimal("price_per_night"),
+                rs.getString("description"),
+                rs.getBoolean("available"));
     }
 }

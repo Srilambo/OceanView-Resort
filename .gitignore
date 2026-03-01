@@ -1,0 +1,33 @@
+# Ocean View Resort - Git Ignore
+
+# Java / Maven
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+**/*.log
+
+# Flutter / Dart
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+**/pubspec.lock
+**/*.old
+**/*.bak
+
+# IDEs
+**/.idea/
+**/*.iml
+**/.vscode/
+**/.DS_Store
+
+# Temporary files
+files_list.txt
+js_files.txt
+pb_files.txt
+repo_files.txt
+old_files.txt

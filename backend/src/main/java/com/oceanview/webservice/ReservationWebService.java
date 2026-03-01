@@ -53,13 +53,13 @@ public class ReservationWebService {
             Reservation created = reservationService.createReservation(reservation);
 
             return "HTTP/1.1 201 Created\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "Access-Control-Allow-Origin: *\r\n" +
-                   "\r\n" + gson.toJson(created);
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(created);
         } catch (Exception e) {
             return "HTTP/1.1 400 Bad Request\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
 
@@ -67,13 +67,13 @@ public class ReservationWebService {
         try {
             Reservation reservation = reservationService.getReservationById(reservationId);
             return "HTTP/1.1 200 OK\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "Access-Control-Allow-Origin: *\r\n" +
-                   "\r\n" + gson.toJson(reservation);
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(reservation);
         } catch (Exception e) {
             return "HTTP/1.1 404 Not Found\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
 
@@ -81,13 +81,40 @@ public class ReservationWebService {
         try {
             Map<String, Object> bill = reservationService.calculateBill(reservationId);
             return "HTTP/1.1 200 OK\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "Access-Control-Allow-Origin: *\r\n" +
-                   "\r\n" + gson.toJson(bill);
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(bill);
         } catch (Exception e) {
             return "HTTP/1.1 404 Not Found\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+        }
+    }
+
+    public String getReservationByNumber(String reservationNumber) {
+        try {
+            Reservation reservation = reservationService.getReservationByNumber(reservationNumber);
+            return "HTTP/1.1 200 OK\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(reservation);
+        } catch (Exception e) {
+            return "HTTP/1.1 404 Not Found\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+        }
+    }
+
+    public String getGuestReservations(String guestId) {
+        try {
+            return "HTTP/1.1 200 OK\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(reservationService.getGuestReservations(guestId));
+        } catch (Exception e) {
+            return "HTTP/1.1 500 Internal Server Error\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
 
@@ -95,13 +122,13 @@ public class ReservationWebService {
         try {
             Reservation cancelled = reservationService.cancelReservation(reservationId);
             return "HTTP/1.1 200 OK\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "Access-Control-Allow-Origin: *\r\n" +
-                   "\r\n" + gson.toJson(cancelled);
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(cancelled);
         } catch (Exception e) {
             return "HTTP/1.1 400 Bad Request\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
 }

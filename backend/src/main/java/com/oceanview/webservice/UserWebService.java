@@ -23,21 +23,20 @@ public class UserWebService {
             User user = userService.authenticate(username, password);
 
             Map<String, Object> response = Map.of(
-                "userId", user.getUserId(),
-                "username", user.getUsername(),
-                "email", user.getEmail(),
-                "roles", user.getRoles(),
-                "authenticated", true
-            );
+                    "userId", user.getUserId(),
+                    "username", user.getUsername(),
+                    "email", user.getEmail(),
+                    "roles", user.getRoles(),
+                    "authenticated", true);
 
             return "HTTP/1.1 200 OK\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "Access-Control-Allow-Origin: *\r\n" +
-                   "\r\n" + gson.toJson(response);
+                    "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "\r\n" + gson.toJson(response);
         } catch (Exception e) {
             return "HTTP/1.1 401 Unauthorized\r\n" +
-                   "Content-Type: application/json\r\n" +
-                   "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Type: application/json\r\n" +
+                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
 }
