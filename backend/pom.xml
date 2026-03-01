@@ -39,6 +39,12 @@
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- MariaDB/MySQL JDBC Driver -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
