@@ -44,6 +44,11 @@ public class HttpServer {
     }
 
     public String handleRequest(String method, String path, String body) {
+        // Handle CORS preflight requests for all endpoints
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return buildPreflightResponse();
+        }
+
         path = path.split("\\?")[0];
 
         try {
@@ -75,6 +80,15 @@ public class HttpServer {
         } catch (Exception e) {
             return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
+    }
+
+    private String buildPreflightResponse() {
+        return "HTTP/1.1 204 No Content\r\n" +
+               "Access-Control-Allow-Origin: *\r\n" +
+               "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+               "Access-Control-Allow-Headers: Content-Type\r\n" +
+               "Content-Length: 0\r\n" +
+               "\r\n";
     }
 
     private String buildJsonResponse(int statusCode, String body) {

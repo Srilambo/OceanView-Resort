@@ -1,0 +1,56 @@
+[
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  },
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  },
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  },
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  },
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  },
+  {
+    "roomId": "R1",
+    "roomNumber": "101",
+    "roomType": "Double",
+    "capacity": 2,
+    "pricePerNight": 150,
+    "description": "Ocean view",
+    "available": true
+  }
+]
