@@ -1,0 +1,31 @@
+[
+  {
+    "reservationId": "4fb237eb-c184-41b9-a66c-570b7b36a65e",
+    "reservationNumber": "RES-FA791A80",
+    "guest": {
+      "guestId": "G1",
+      "name": "John Doe",
+      "email": "john@test.com",
+      "contactNumber": "1234567890",
+      "address": "123 Street",
+      "passportNumber": "ABC123",
+      "createdAt": "2026-03-01T14:49:42.1757987"
+    },
+    "room": {
+      "roomId": "R1",
+      "roomNumber": "101",
+      "roomType": "Double",
+      "capacity": 2,
+      "pricePerNight": 150,
+      "description": "Ocean view",
+      "available": true
+    },
+    "checkInDate": "2026-03-02",
+    "checkOutDate": "2026-03-04",
+    "numberOfNights": 2,
+    "totalCost": 300,
+    "status": "PENDING",
+    "createdAt": "2026-03-01T14:49:42.3510164",
+    "updatedAt": "2026-03-01T14:49:42.3510164"
+  }
+]
