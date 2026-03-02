@@ -46,7 +46,7 @@ OceanView-Resort/
 │   │   ├── repository/     # Data Access Objects
 │   │   └── webservice/     # HTTP Handlers
 │   ├── resources/          # SQL Schema & Seed Data
-│   └── pom.xml             # Maven Config
+│   └── pom.xml             # Maven Project Config
 └── README.md               # Project Hub
 ```
 
@@ -55,8 +55,8 @@ OceanView-Resort/
 ## 🏁 Getting Started
 
 ### 1. Database Setup
-1. Ensure **MariaDB** is running on your machine.
-2. Run the schema located at `backend/resources/schema.sql` to initialize the database and seed data.
+1. Ensure **MariaDB** is running.
+2. Initialize with `backend/resources/schema.sql`.
 
 ### 2. Launch Backend
 ```bash
@@ -64,7 +64,6 @@ cd backend
 mvn clean compile
 mvn exec:java
 ```
-_Terminal should confirm:_ `🏨 Ocean View Resort Backend Started`
 
 ### 3. Launch Frontend
 ```bash
@@ -75,11 +74,19 @@ flutter run -d chrome
 ---
 
 ## ✨ Features
+- **Luxury Landing Screen:** High-end introduction to the resort system.
+- **Secure Authentication:** User login and registration integrated with backend.
 - **Real-time Room Availability:** Instant check for room status.
 - **Automated Billing:** Dynamic price calculation per night.
 - **Reservation Management:** Full CRUD operations for bookings.
-- **Luxury UX:** Beautifully crafted icons and fonts for a premium resort feel.
+- **Luxury UX:** Beautifully crafted icons, gradients, and fonts for a premium feel.
 
 ---
+
+> [!TIP]
+> **Best Practices Maintained:** 
+> - **Separation of Concerns:** UI is decoupled from data logic via services.
+> - **Error Handling:** Robust try-catch blocks in both frontend and backend.
+> - **Consistency:** Unified naming conventions and clean code structure.
 > [!IMPORTANT]
 > This project is strictly restricted to **Flutter (Dart)** for the interface and **Pure Java** for the logic. High performance is achieved by avoiding unnecessary dependencies and JavaScript bloat.

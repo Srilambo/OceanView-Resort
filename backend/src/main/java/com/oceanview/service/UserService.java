@@ -27,6 +27,21 @@ public class UserService {
         }
     }
 
+    public User register(User user) throws Exception {
+        try {
+            if (userRepository.existsByUsername(user.getUsername())) {
+                throw new Exception("Username already exists");
+            }
+            if (user.getUserId() == null || user.getUserId().isEmpty()) {
+                user.setUserId(java.util.UUID.randomUUID().toString());
+            }
+            userRepository.save(user);
+            return user;
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
     public User getUserByUsername(String username) throws Exception {
         try {
             return userRepository.findByUsername(username);

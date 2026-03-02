@@ -59,6 +59,9 @@ public class ReservationWebService {
         } catch (Exception e) {
             return "HTTP/1.1 400 Bad Request\r\n" +
                     "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                    "Access-Control-Allow-Headers: Content-Type\r\n" +
                     "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
@@ -73,6 +76,9 @@ public class ReservationWebService {
         } catch (Exception e) {
             return "HTTP/1.1 404 Not Found\r\n" +
                     "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                    "Access-Control-Allow-Headers: Content-Type\r\n" +
                     "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
@@ -114,6 +120,9 @@ public class ReservationWebService {
         } catch (Exception e) {
             return "HTTP/1.1 500 Internal Server Error\r\n" +
                     "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                    "Access-Control-Allow-Headers: Content-Type\r\n" +
                     "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
@@ -128,6 +137,9 @@ public class ReservationWebService {
         } catch (Exception e) {
             return "HTTP/1.1 400 Bad Request\r\n" +
                     "Content-Type: application/json\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                    "Access-Control-Allow-Headers: Content-Type\r\n" +
                     "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
         }
     }
