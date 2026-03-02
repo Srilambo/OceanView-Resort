@@ -8,8 +8,7 @@ import '../services/api_service.dart';
 class NewReservationScreen extends StatefulWidget {
   final String userId;
 
-  const NewReservationScreen({Key? key, required this.userId})
-    : super(key: key);
+  const NewReservationScreen({super.key, required this.userId});
 
   @override
   State<NewReservationScreen> createState() => _NewReservationScreenState();
@@ -156,8 +155,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Text(
                     'Select Check-in Date',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   InkWell(
@@ -187,8 +186,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Text(
                     'Select Check-out Date',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   InkWell(
@@ -218,8 +217,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Text(
                     'Select Room',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   _availableRooms.isEmpty
@@ -256,8 +255,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Text(
                     'Special Requests (Optional)',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   TextField(

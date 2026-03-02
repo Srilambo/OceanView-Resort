@@ -180,4 +180,33 @@ class ApiService {
       throw Exception('Connection error: $e');
     }
   }
+
+  static Future<User> register(
+    String username,
+    String password,
+    String email,
+  ) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'username': username,
+              'password': password,
+              'email': email,
+              'enabled': true,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return User.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Registration failed: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
 }

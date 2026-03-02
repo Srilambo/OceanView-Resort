@@ -7,7 +7,7 @@ import '../services/api_service.dart';
 class BillScreen extends StatefulWidget {
   final String? reservationId;
 
-  const BillScreen({Key? key, this.reservationId}) : super(key: key);
+  const BillScreen({super.key, this.reservationId});
 
   @override
   State<BillScreen> createState() => _BillScreenState();
@@ -138,7 +138,9 @@ class _BillScreenState extends State<BillScreen> {
                       Center(
                         child: Text(
                           'BILL',
-                          style: Theme.of(context).textTheme.headlineSmall
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),

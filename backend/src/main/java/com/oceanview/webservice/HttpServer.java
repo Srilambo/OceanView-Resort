@@ -62,6 +62,10 @@ public class HttpServer {
                 return userService.login(body);
             }
 
+            if (path.equals("/api/auth/register") && method.equals("POST")) {
+                return userService.register(body);
+            }
+
             // Rooms
             if (path.equals("/api/rooms") && method.equals("GET")) {
                 return roomService.getAllRooms(onlyAvailable);
