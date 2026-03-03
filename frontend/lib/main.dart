@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'screens/landing_screen.dart';
+import 'package:provider/provider.dart';
+import 'features/user/home/screens/landing_screen.dart';
+import 'features/user/home/providers/booking_provider.dart';
+import 'theme/app_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BookingProvider()),
+      ],
+      child: const OceanViewResortApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class OceanViewResortApp extends StatelessWidget {
+  const OceanViewResortApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ocean View Resort',
-      theme: ThemeData(
-        primaryColor: Colors.blue.shade900,
-        useMaterial3: true,
-        textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
-      ),
-      home: const LandingScreen(),
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.darkTheme,
+      home: const LandingScreen(),
     );
   }
 }
