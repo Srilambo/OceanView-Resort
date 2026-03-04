@@ -85,7 +85,7 @@ class _ContactHero extends StatelessWidget {
               'assets/images/luxury_pool.png'), // Using pool for now
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.4),
+            Colors.black.withOpacity(0.4),
             BlendMode.darken,
           ),
         ),
@@ -233,7 +233,7 @@ class _ContactForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
-        color: AppColors.darkBgSecondary.withValues(alpha: 0.5),
+        color: AppColors.darkBgSecondary.withOpacity(0.5),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.glassBorder),
       ),
@@ -306,7 +306,7 @@ class _InputField extends StatelessWidget {
           style: const TextStyle(color: AppColors.cream),
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.darkBg.withValues(alpha: 0.3),
+            fillColor: AppColors.darkBg.withOpacity(0.3),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: AppColors.glassBorder),
@@ -359,3 +359,4 @@ class _MapSection extends StatelessWidget {
     );
   }
 }
+

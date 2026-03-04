@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../auth/screens/login_screen.dart';
+import 'package:ocean_view_resort_app/features/authentication/screens/login_screen.dart';
 import '../../../../theme/app_colors.dart';
 
 class CtaSectionWidget extends StatelessWidget {
@@ -12,9 +12,9 @@ class CtaSectionWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 80, horizontal: 60),
       padding: const EdgeInsets.all(60),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.12),
+          color: Colors.white.withOpacity(0.12),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(30),
@@ -36,7 +36,7 @@ class CtaSectionWidget extends StatelessWidget {
             'Join hundreds of satisfied guests who have discovered paradise at Ocean View Resort. Book your unforgettable beachside experience today.',
             style: GoogleFonts.poppins(
               fontSize: 16,
-              color: AppColors.textLight.withValues(alpha: 0.8),
+              color: AppColors.textLight.withOpacity(0.8),
               height: 1.8,
               fontWeight: FontWeight.w300,
             ),
@@ -56,7 +56,7 @@ class CtaSectionWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.goldAccent.withValues(alpha: 0.4),
+            color: AppColors.goldAccent.withOpacity(0.4),
             blurRadius: 30,
             spreadRadius: 2,
           ),
@@ -88,3 +88,4 @@ class CtaSectionWidget extends StatelessWidget {
     );
   }
 }
+

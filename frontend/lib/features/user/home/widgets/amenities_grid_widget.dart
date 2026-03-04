@@ -20,7 +20,7 @@ class AmenitiesGridWidget extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 60),
-      color: Colors.white.withValues(alpha: 0.02),
+      color: Colors.white.withOpacity(0.02),
       child: Column(
         children: [
           Text(
@@ -82,7 +82,7 @@ class _GlassAmenityCardState extends State<_GlassAmenityCard> {
           border: Border.all(
             color: _isHovered
                 ? AppColors.goldAccent
-                : Colors.white.withValues(alpha: 0.1),
+                : Colors.white.withOpacity(0.1),
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -109,3 +109,4 @@ class _GlassAmenityCardState extends State<_GlassAmenityCard> {
     );
   }
 }
+

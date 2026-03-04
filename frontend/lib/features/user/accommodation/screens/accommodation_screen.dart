@@ -87,7 +87,7 @@ class AccommodationScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(48),
                         decoration: BoxDecoration(
                           color:
-                              AppColors.darkBgSecondary.withValues(alpha: 0.5),
+                              AppColors.darkBgSecondary.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(color: AppColors.glassBorder),
                         ),
@@ -158,7 +158,7 @@ class _AccommodationHero extends StatelessWidget {
           image: const AssetImage('assets/images/luxury_room.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.4),
+            Colors.black.withOpacity(0.4),
             BlendMode.darken,
           ),
         ),
@@ -288,3 +288,4 @@ class _TypeCard extends StatelessWidget {
     );
   }
 }
+

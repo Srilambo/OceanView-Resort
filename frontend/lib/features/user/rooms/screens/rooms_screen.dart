@@ -104,7 +104,7 @@ class _RoomsHero extends StatelessWidget {
           image: const AssetImage('assets/images/luxury_room.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.4),
+            Colors.black.withOpacity(0.4),
             BlendMode.darken,
           ),
         ),
@@ -205,7 +205,7 @@ class _RoomCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -284,3 +284,4 @@ class _RoomCard extends StatelessWidget {
     );
   }
 }
+

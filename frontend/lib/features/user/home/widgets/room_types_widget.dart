@@ -94,13 +94,13 @@ class _GlassRoomCardState extends State<_GlassRoomCard> {
           border: Border.all(
             color: _isHovered
                 ? AppColors.goldAccent
-                : Colors.white.withValues(alpha: 0.12),
+                : Colors.white.withOpacity(0.12),
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: AppColors.goldAccent.withValues(alpha: 0.2),
+                    color: AppColors.goldAccent.withOpacity(0.2),
                     blurRadius: 24,
                   )
                 ]
@@ -134,7 +134,7 @@ class _GlassRoomCardState extends State<_GlassRoomCard> {
               widget.capacity,
               style: GoogleFonts.poppins(
                 fontSize: 12,
-                color: AppColors.textLight.withValues(alpha: 0.6),
+                color: AppColors.textLight.withOpacity(0.6),
               ),
             ),
           ],
@@ -143,3 +143,4 @@ class _GlassRoomCardState extends State<_GlassRoomCard> {
     );
   }
 }
+

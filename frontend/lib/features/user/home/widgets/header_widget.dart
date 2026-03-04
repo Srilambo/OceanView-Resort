@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../auth/screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:ocean_view_resort_app/features/authentication/providers/auth_provider.dart';
+import 'package:ocean_view_resort_app/features/authentication/screens/login_screen.dart';
 import '../../../../theme/app_colors.dart';
 import '../../rooms/screens/rooms_screen.dart';
 import '../../amenities/screens/amenities_screen.dart';
 import '../../offers/screens/offers_screen.dart';
 import '../../contact/screens/contact_screen.dart';
-import '../screens/landing_screen.dart';
 
 class HeaderWidget extends StatelessWidget {
   final Animation<double>? fadeAnimation;
@@ -33,10 +34,10 @@ class HeaderWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
         decoration: BoxDecoration(
-          color: AppColors.darkBg.withValues(alpha: 0.7),
-          border: Border(
+          color: AppColors.darkBg.withOpacity(0.7),
+          border: const Border(
             bottom: BorderSide(
-              color: AppColors.goldAccent.withValues(alpha: 0.2),
+              color: AppColors.goldAccent,
               width: 1,
             ),
           ),
@@ -54,11 +55,8 @@ class HeaderWidget extends StatelessWidget {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const LandingScreen()),
-                      (route) => false,
-                    );
+                    // Already at root, just pop to top if needed
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                   },
                   child: Row(
                     children: [
@@ -69,8 +67,7 @@ class HeaderWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  AppColors.goldAccent.withValues(alpha: 0.3),
+                              color: AppColors.goldAccent.withOpacity(0.3),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -127,79 +124,128 @@ class HeaderWidget extends StatelessWidget {
             ),
 
             // Right actions
-            Row(
-              children: [
-                // Sign In Button
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.goldAccent,
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'SIGN IN',
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, _) {
+                if (authProvider.isLoggedIn) {
+                  return Row(
+                    children: [
+                      Text(
+                        'HI, ${authProvider.currentUser?.username.toUpperCase()}',
                         style: GoogleFonts.poppins(
                           color: AppColors.goldAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Book Now Button
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Trigger scroll to booking section or navigate
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 11,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: AppColors.goldGradient,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.goldAccent.withValues(alpha: 0.3),
-                            blurRadius: 15,
-                            spreadRadius: 0,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'BOOK NOW',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.darkBg,
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
                           letterSpacing: 1,
                         ),
                       ),
+                      const SizedBox(width: 16),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => authProvider.logout(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.redAccent,
+                                width: 1.5,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'LOGOUT',
+                              style: GoogleFonts.poppins(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    // Sign In Button
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColors.goldAccent,
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'SIGN IN',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.goldAccent,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                    const SizedBox(width: 16),
+                    // Book Now Button
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Trigger scroll to booking section or navigate
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 11,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.goldGradient,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.goldAccent.withOpacity(0.3),
+                                blurRadius: 15,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'BOOK NOW',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.darkBg,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -258,7 +304,7 @@ class _NavLinkState extends State<_NavLink> {
                   boxShadow: _isHovered
                       ? [
                           BoxShadow(
-                            color: AppColors.goldAccent.withValues(alpha: 0.5),
+                            color: AppColors.goldAccent.withOpacity(0.5),
                             blurRadius: 6,
                           ),
                         ]

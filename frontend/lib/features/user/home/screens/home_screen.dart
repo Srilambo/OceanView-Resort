@@ -4,7 +4,7 @@ import 'dart:ui';
 import '../../../../models/user.dart';
 import '../../../../theme/app_colors.dart';
 import '../../booking/screens/bill_screen.dart';
-import '../../../auth/screens/login_screen.dart';
+import 'package:ocean_view_resort_app/features/authentication/screens/login_screen.dart';
 import '../../booking/screens/new_reservation_screen.dart';
 import '../../booking/screens/view_reservations_screen.dart';
 
@@ -31,9 +31,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _bounceController.repeat(reverse: true);
+    });
 
-    _fadeController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _fadeController.forward();
+      }
+    });
   }
 
   @override

@@ -131,7 +131,7 @@ class _AmenitiesHero extends StatelessWidget {
           image: const AssetImage('assets/images/luxury_pool.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.4),
+            Colors.black.withOpacity(0.4),
             BlendMode.darken,
           ),
         ),
@@ -220,7 +220,7 @@ class _AmenityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkBgSecondary.withValues(alpha: 0.5),
+        color: AppColors.darkBgSecondary.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.glassBorder),
       ),
@@ -274,3 +274,4 @@ class _AmenityCard extends StatelessWidget {
     );
   }
 }
+

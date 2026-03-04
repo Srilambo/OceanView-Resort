@@ -11,10 +11,10 @@ class FooterWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 60),
       decoration: BoxDecoration(
-        color: AppColors.darkBg.withValues(alpha: 0.8),
+        color: AppColors.darkBg.withOpacity(0.8),
         border: Border(
           top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Colors.white.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -86,7 +86,7 @@ class FooterWidget extends StatelessWidget {
                       'Subscribe to receive latest news and exclusive offers.',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: AppColors.textLight.withValues(alpha: 0.6),
+                        color: AppColors.textLight.withOpacity(0.6),
                         height: 1.6,
                       ),
                     ),
@@ -98,7 +98,7 @@ class FooterWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 60),
-          Divider(color: Colors.white.withValues(alpha: 0.1)),
+          Divider(color: Colors.white.withOpacity(0.1)),
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,7 +107,7 @@ class FooterWidget extends StatelessWidget {
                 '(c) 2025 OCEAN VIEW RESORT. ALL RIGHTS RESERVED.',
                 style: GoogleFonts.poppins(
                   fontSize: 10,
-                  color: AppColors.textLight.withValues(alpha: 0.4),
+                  color: AppColors.textLight.withOpacity(0.4),
                   letterSpacing: 1,
                 ),
               ),
@@ -154,7 +154,7 @@ class FooterWidget extends StatelessWidget {
           label,
           style: GoogleFonts.poppins(
             fontSize: 12,
-            color: AppColors.textLight.withValues(alpha: 0.6),
+            color: AppColors.textLight.withOpacity(0.6),
           ),
         ),
       ),
@@ -166,13 +166,13 @@ class FooterWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon,
-            size: 16, color: AppColors.goldAccent.withValues(alpha: 0.7)),
+            size: 16, color: AppColors.goldAccent.withOpacity(0.7)),
         const SizedBox(width: 12),
         Text(
           text,
           style: GoogleFonts.poppins(
             fontSize: 12,
-            color: AppColors.textLight.withValues(alpha: 0.6),
+            color: AppColors.textLight.withOpacity(0.6),
             height: 1.5,
           ),
         ),
@@ -186,7 +186,7 @@ class FooterWidget extends StatelessWidget {
       child: Icon(
         icon,
         size: 18,
-        color: AppColors.textLight.withValues(alpha: 0.4),
+        color: AppColors.textLight.withOpacity(0.4),
       ),
     );
   }
@@ -195,9 +195,9 @@ class FooterWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Row(
         children: [
@@ -210,7 +210,7 @@ class FooterWidget extends StatelessWidget {
                   hintText: 'Your email address',
                   hintStyle: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: Colors.white.withOpacity(0.3),
                   ),
                   border: InputBorder.none,
                 ),
@@ -237,3 +237,4 @@ class FooterWidget extends StatelessWidget {
     );
   }
 }
+

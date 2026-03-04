@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ocean_view_resort_app/features/authentication/screens/login_screen.dart';
 import '../../../../theme/app_colors.dart';
 
 class HeroSectionWidget extends StatelessWidget {
@@ -21,8 +22,8 @@ class HeroSectionWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF1A2845).withValues(alpha: 0.85),
-            const Color(0xFF0F3460).withValues(alpha: 0.85),
+            const Color(0xFF1A2845).withOpacity(0.85),
+            const Color(0xFF0F3460).withOpacity(0.85),
           ],
         ),
         image: DecorationImage(
@@ -42,7 +43,7 @@ class HeroSectionWidget extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  AppColors.darkBg.withValues(alpha: 0.6),
+                  AppColors.darkBg.withOpacity(0.6),
                 ],
               ),
             ),
@@ -118,7 +119,7 @@ class HeroSectionWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: AppColors.goldAccent.withValues(alpha: 0.4),
+            color: AppColors.goldAccent.withOpacity(0.4),
             blurRadius: 24,
             spreadRadius: 2,
           ),
@@ -127,7 +128,11 @@ class HeroSectionWidget extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          },
           borderRadius: BorderRadius.circular(10),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
