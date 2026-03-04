@@ -26,8 +26,10 @@ class _BillScreenState extends State<BillScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _bounceController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 3))
-          ..repeat(reverse: true);
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _bounceController.repeat(reverse: true);
+    });
     if (widget.reservationId != null) {
       _reservationNumberController.text = widget.reservationId!;
       Future.delayed(const Duration(milliseconds: 500), _generateBill);

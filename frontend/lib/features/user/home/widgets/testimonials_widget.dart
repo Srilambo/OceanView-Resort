@@ -27,7 +27,7 @@ class TestimonialsWidget extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 60),
-      color: Colors.white.withValues(alpha: 0.02),
+      color: Colors.white.withOpacity(0.02),
       child: Column(
         children: [
           Text(
@@ -76,9 +76,9 @@ class _GlassTestimonialCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Colors.white.withOpacity(0.1),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(20),
@@ -118,3 +118,4 @@ class _GlassTestimonialCard extends StatelessWidget {
     );
   }
 }
+

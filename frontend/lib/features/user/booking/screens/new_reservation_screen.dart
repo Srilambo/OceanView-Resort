@@ -345,7 +345,8 @@ class _NewReservationScreenState extends State<NewReservationScreen>
               children: [
                 Text(
                   title,
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                  style:
+                      const TextStyle(color: AppColors.textMuted, fontSize: 12),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -461,8 +462,8 @@ class _NewReservationScreenState extends State<NewReservationScreen>
                     const SizedBox(height: 4),
                     Text(
                       'Room ${room.roomNumber} • Up to ${room.capacity} guests',
-                      style:
-                          TextStyle(color: AppColors.textMuted, fontSize: 13),
+                      style: const TextStyle(
+                          color: AppColors.textMuted, fontSize: 13),
                     ),
                   ],
                 ),

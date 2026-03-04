@@ -29,7 +29,10 @@ class _ViewReservationsScreenState extends State<ViewReservationsScreen>
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _bounceController.repeat(reverse: true);
+    });
     _loadReservations();
   }
 

@@ -13,15 +13,15 @@ class BookingCardWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 60, vertical: 80),
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Colors.white.withOpacity(0.06),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
+          color: Colors.white.withOpacity(0.15),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 32,
             spreadRadius: 8,
           ),
@@ -138,9 +138,9 @@ class BookingCardWidget extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.04),
+              color: Colors.white.withOpacity(0.04),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.12),
+                color: Colors.white.withOpacity(0.12),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(12),
@@ -187,9 +187,9 @@ class BookingCardWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
+            color: Colors.white.withOpacity(0.04),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: Colors.white.withOpacity(0.12),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -239,7 +239,7 @@ class BookingCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: AppColors.goldAccent.withValues(alpha: 0.4),
+            color: AppColors.goldAccent.withOpacity(0.4),
             blurRadius: 24,
             spreadRadius: 2,
           ),
@@ -276,3 +276,4 @@ class BookingCardWidget extends StatelessWidget {
     );
   }
 }
+

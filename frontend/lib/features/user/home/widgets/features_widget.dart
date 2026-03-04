@@ -119,14 +119,14 @@ class _FeatureCardState extends State<_FeatureCard> {
           border: Border.all(
             color: _isHovered
                 ? AppColors.goldAccent
-                : Colors.white.withValues(alpha: 0.12),
+                : Colors.white.withOpacity(0.12),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: AppColors.goldAccent.withValues(alpha: 0.2),
+                    color: AppColors.goldAccent.withOpacity(0.2),
                     blurRadius: 24,
                     spreadRadius: 0,
                   ),
@@ -169,3 +169,4 @@ class _FeatureCardState extends State<_FeatureCard> {
     );
   }
 }
+

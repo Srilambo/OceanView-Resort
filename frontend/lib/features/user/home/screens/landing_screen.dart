@@ -37,7 +37,7 @@ class _LandingScreenState extends State<LandingScreen>
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
 
     _scrollController.addListener(() {
       if (mounted) {
@@ -48,7 +48,12 @@ class _LandingScreenState extends State<LandingScreen>
       }
     });
 
-    _fadeController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _fadeController.forward();
+        _bounceController.repeat(reverse: true);
+      }
+    });
   }
 
   @override
@@ -127,7 +132,7 @@ class _LandingScreenState extends State<LandingScreen>
                 height: 500,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.goldAccent.withValues(alpha: 0.05),
+                  color: AppColors.goldAccent.withOpacity(0.05),
                 ),
               ),
             ),
@@ -139,7 +144,7 @@ class _LandingScreenState extends State<LandingScreen>
                 height: 400,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.sageGreen.withValues(alpha: 0.05),
+                  color: AppColors.sageGreen.withOpacity(0.05),
                 ),
               ),
             ),
@@ -159,7 +164,7 @@ class _LandingScreenState extends State<LandingScreen>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.goldAccent.withValues(alpha: 0.3),
+              color: AppColors.goldAccent.withOpacity(0.3),
               blurRadius: 20,
               spreadRadius: 2,
             ),
@@ -189,7 +194,7 @@ class BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.goldAccent.withValues(alpha: 0.02)
+      ..color = AppColors.goldAccent.withOpacity(0.02)
       ..strokeWidth = 1;
 
     for (int i = 0; i < 8; i++) {
