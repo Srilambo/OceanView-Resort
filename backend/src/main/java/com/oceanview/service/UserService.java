@@ -28,6 +28,10 @@ public class UserService {
     }
 
     public User register(User user) throws Exception {
+        return registerWithRoles(user, null);
+    }
+
+    public User registerWithRoles(User user, java.util.Set<String> roles) throws Exception {
         try {
             if (userRepository.existsByUsername(user.getUsername())) {
                 throw new Exception("Username already exists");
@@ -35,8 +39,24 @@ public class UserService {
             if (user.getUserId() == null || user.getUserId().isEmpty()) {
                 user.setUserId(java.util.UUID.randomUUID().toString());
             }
-            userRepository.save(user);
+            userRepository.save(user, roles);
             return user;
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) throws Exception {
+        try {
+            userRepository.deleteById(userId);
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public void updateUser(User user) throws Exception {
+        try {
+            userRepository.update(user);
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }
@@ -45,6 +65,22 @@ public class UserService {
     public User getUserByUsername(String username) throws Exception {
         try {
             return userRepository.findByUsername(username);
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public java.util.List<User> getAllUsers() throws Exception {
+        try {
+            return userRepository.findAll();
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public java.util.List<User> getUsersByRole(String role) throws Exception {
+        try {
+            return userRepository.findByRole(role);
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }

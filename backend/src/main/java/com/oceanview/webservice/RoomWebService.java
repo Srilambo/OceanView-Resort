@@ -30,17 +30,50 @@ public class RoomWebService {
             } else {
                 rooms = roomService.getAllRooms();
             }
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(rooms);
+            return buildJsonResponse(200, gson.toJson(rooms));
         } catch (Exception e) {
-            return "HTTP/1.1 500 Internal Server Error\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
-                    "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
+    }
+
+    public String createRoom(String jsonBody) {
+        try {
+            Room room = gson.fromJson(jsonBody, Room.class);
+            Room createdRoom = roomService.createRoom(room);
+            return buildJsonResponse(201, gson.toJson(createdRoom));
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String updateRoom(String jsonBody) {
+        try {
+            Room room = gson.fromJson(jsonBody, Room.class);
+            Room updatedRoom = roomService.updateRoom(room);
+            return buildJsonResponse(200, gson.toJson(updatedRoom));
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String deleteRoom(String id) {
+        try {
+            roomService.deleteRoom(id);
+            return buildJsonResponse(200, "{\"message\": \"Room deleted successfully\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    private String buildJsonResponse(int statusCode, String body) {
+        String statusText = (statusCode == 200) ? "OK"
+                : (statusCode == 201 ? "Created" : (statusCode == 400 ? "Bad Request" : "Internal Server Error"));
+        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
+                "Content-Type: application/json\r\n" +
+                "Access-Control-Allow-Origin: *\r\n" +
+                "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                "Access-Control-Allow-Headers: Content-Type\r\n" +
+                "Content-Length: " + body.length() + "\r\n" +
+                "\r\n" + body;
     }
 }

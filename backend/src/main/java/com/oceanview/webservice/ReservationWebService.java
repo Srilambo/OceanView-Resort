@@ -27,7 +27,6 @@ public class ReservationWebService {
     public String createReservation(String jsonBody) {
         try {
             Map<String, Object> data = gson.fromJson(jsonBody, Map.class);
-
             Reservation reservation = new Reservation();
 
             if (data.containsKey("guest")) {
@@ -51,96 +50,88 @@ public class ReservationWebService {
             }
 
             Reservation created = reservationService.createReservation(reservation);
-
-            return "HTTP/1.1 201 Created\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(created);
+            return buildJsonResponse(201, gson.toJson(created));
         } catch (Exception e) {
-            return "HTTP/1.1 400 Bad Request\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
-                    "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
     public String getReservation(String reservationId) {
         try {
             Reservation reservation = reservationService.getReservationById(reservationId);
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(reservation);
+            return buildJsonResponse(200, gson.toJson(reservation));
         } catch (Exception e) {
-            return "HTTP/1.1 404 Not Found\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
-                    "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(404, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
     public String getBill(String reservationId) {
         try {
             Map<String, Object> bill = reservationService.calculateBill(reservationId);
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(bill);
+            return buildJsonResponse(200, gson.toJson(bill));
         } catch (Exception e) {
-            return "HTTP/1.1 404 Not Found\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(404, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
     public String getReservationByNumber(String reservationNumber) {
         try {
             Reservation reservation = reservationService.getReservationByNumber(reservationNumber);
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(reservation);
+            return buildJsonResponse(200, gson.toJson(reservation));
         } catch (Exception e) {
-            return "HTTP/1.1 404 Not Found\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(404, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
     public String getGuestReservations(String guestId) {
         try {
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(reservationService.getGuestReservations(guestId));
+            return buildJsonResponse(200, gson.toJson(reservationService.getGuestReservations(guestId)));
         } catch (Exception e) {
-            return "HTTP/1.1 500 Internal Server Error\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
-                    "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
     public String cancelReservation(String reservationId) {
         try {
             Reservation cancelled = reservationService.cancelReservation(reservationId);
-            return "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "\r\n" + gson.toJson(cancelled);
+            return buildJsonResponse(200, gson.toJson(cancelled));
         } catch (Exception e) {
-            return "HTTP/1.1 400 Bad Request\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Access-Control-Allow-Origin: *\r\n" +
-                    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
-                    "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public String updateReservation(String id, String jsonBody) {
+        try {
+            Map<String, String> data = gson.fromJson(jsonBody, Map.class);
+            String status = data.get("status");
+            Reservation updated = reservationService.updateReservation(id, status);
+            return buildJsonResponse(200, gson.toJson(updated));
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String getAllReservations() {
+        try {
+            java.util.List<Reservation> reservations = reservationService.getAllReservations();
+            return buildJsonResponse(200, gson.toJson(reservations));
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    private String buildJsonResponse(int statusCode, String body) {
+        String statusText = (statusCode == 200) ? "OK"
+                : (statusCode == 201 ? "Created"
+                        : (statusCode == 404 ? "Not Found"
+                                : (statusCode == 400 ? "Bad Request" : "Internal Server Error")));
+        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
+                "Content-Type: application/json\r\n" +
+                "Access-Control-Allow-Origin: *\r\n" +
+                "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
+                "Access-Control-Allow-Headers: Content-Type\r\n" +
+                "Content-Length: " + body.length() + "\r\n" +
+                "\r\n" + body;
     }
 }

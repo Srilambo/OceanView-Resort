@@ -1,5 +1,6 @@
 package com.oceanview.webservice;
 
+import com.oceanview.admin.AdminWebService;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,12 +13,14 @@ public class HttpServer {
     private ReservationWebService reservationService;
     private UserWebService userService;
     private RoomWebService roomService;
+    private AdminWebService adminService;
 
     public HttpServer(int port) {
         this.port = port;
         this.reservationService = new ReservationWebService();
         this.userService = new UserWebService();
         this.roomService = new RoomWebService();
+        this.adminService = new AdminWebService();
     }
 
     public void start() {
@@ -66,12 +69,55 @@ public class HttpServer {
                 return userService.register(body);
             }
 
+            // Users
+            if (path.equals("/api/users") && method.equals("GET")) {
+                return userService.getAllUsers();
+            }
+
+            if (path.matches("/api/users/role/[A-Z_]+") && method.equals("GET")) {
+                String role = path.substring("/api/users/role/".length());
+                return userService.getUsersByRole(role);
+            }
+
+            if (path.matches("/api/users/[a-fA-F0-9-]+") && method.equals("DELETE")) {
+                String userId = path.substring("/api/users/".length());
+                return userService.deleteUser(userId);
+            }
+
+            if (path.equals("/api/users") && method.equals("PUT")) {
+                return userService.updateUser(body);
+            }
+
+            if (path.equals("/api/admin/users") && method.equals("POST")) {
+                return adminService.adminCreateUser(body);
+            }
+
+            if (path.equals("/api/admin/dashboard/stats") && method.equals("GET")) {
+                return adminService.getDashboardStats();
+            }
+
             // Rooms
             if (path.equals("/api/rooms") && method.equals("GET")) {
                 return roomService.getAllRooms(onlyAvailable);
             }
 
+            if (path.equals("/api/rooms") && method.equals("POST")) {
+                return roomService.createRoom(body);
+            }
+
+            if (path.equals("/api/rooms") && method.equals("PUT")) {
+                return roomService.updateRoom(body);
+            }
+
+            if (path.matches("/api/rooms/[a-fA-F0-9-]+") && method.equals("DELETE")) {
+                String id = path.substring("/api/rooms/".length());
+                return roomService.deleteRoom(id);
+            }
+
             // Reservations
+            if (path.equals("/api/reservations") && method.equals("GET")) {
+                return reservationService.getAllReservations();
+            }
             if (path.equals("/api/reservations") && method.equals("POST")) {
                 return reservationService.createReservation(body);
             }
@@ -101,6 +147,11 @@ public class HttpServer {
                 return reservationService.cancelReservation(id);
             }
 
+            if (path.matches("/api/reservations/[a-fA-F0-9-]+") && method.equals("PUT")) {
+                String id = path.substring("/api/reservations/".length());
+                return reservationService.updateReservation(id, body);
+            }
+
             return buildJsonResponse(404, "{\"error\": \"Endpoint not found: " + method + " " + rawPath + "\"}");
 
         } catch (Exception e) {
@@ -119,8 +170,7 @@ public class HttpServer {
     }
 
     private String buildJsonResponse(int statusCode, String body) {
-        String statusText = statusCode == 200 ? "OK" : statusCode == 404 ? "Not Found" : "Internal Server Error";
-        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
+        return "HTTP/1.1 " + statusCode + " \r\n" +
                 "Content-Type: application/json\r\n" +
                 "Access-Control-Allow-Origin: *\r\n" +
                 "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +

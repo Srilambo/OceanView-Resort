@@ -13,19 +13,19 @@ A premium, high-performance resort booking management system built with absolute
 ### 📱 Frontend: Flutter & Dart
 - **Framework:** Flutter (Built for high performance)
 - **Language:** Dart 2.19+
-- **Styling:** Custom Luxury UI with Material 3
-- **State Management:** Provider pattern
-- **Architecture:** Clean UI/Service separation
+- **Architecture:** Feature-based Clean Architecture
+- **State Management:** Provider & Service patterns
+- **Styling:** Custom Luxury UI with Glassmorphism and Material 3
 
 ### ⚙️ Backend: Pure Java
 - **Language:** Java 11 (Strictly typed, robust)
-- **Engine:** Custom-built High-Performance HTTP Server (No heavy frameworks)
+- **Engine:** Custom-built High-Performance HTTP Server (No Spring Boot, No heavy frameworks)
 - **Protocol:** RESTful API with GSON for high-speed serialization
-- **Database Access:** Pure JDBC (Direct connection for maximum speed)
+- **Database Access:** Pure JDBC (Direct connection for maximum performance)
 
 ### 🗄️ Database
 - **Engine:** MariaDB 10.x
-- **Schema:** Optimized relational structure with Foreign Key integrity
+- **Schema:** Optimized relational structure with Foreign Key integrity and stored logic
 
 ---
 
@@ -34,29 +34,59 @@ A premium, high-performance resort booking management system built with absolute
 ```text
 OceanView-Resort/
 ├── frontend/               # 📱 Flutter Mobile/Web Application
-│   ├── lib/                # Dart Code
-│   │   ├── models/         # Data structures
-│   │   ├── screens/        # UI Views
-│   │   └── services/       # API Integration
-│   └── pubspec.yaml        # Flutter Config
+│   ├── lib/
+│   │   ├── features/       # 🧩 Modular Business Features
+│   │   │   ├── main/       # Dashboards & Core Views
+│   │   │   ├── user/       # Profile & Management
+│   │   │   └── auth/       # Authentication Logic
+│   │   ├── models/         # Domain Entities
+│   │   ├── services/       # API Integration Layer
+│   │   ├── shared/         # Reusable Components
+│   │   └── theme/          # Luxury Design System
+│   └── pubspec.yaml        # Project Configuration
 ├── backend/                # ⚙️ Java Backend Service
-│   ├── src/main/java/      # Pure Java Code
-│   │   ├── db/             # JDBC Helpers
-│   │   ├── model/          # POJOs
-│   │   ├── repository/     # Data Access Objects
-│   │   └── webservice/     # HTTP Handlers
-│   ├── resources/          # SQL Schema & Seed Data
-│   └── pom.xml             # Maven Project Config
+│   ├── src/main/java/com/oceanview/
+│   │   ├── webservice/     # HTTP Handlers (REST Controllers)
+│   │   ├── service/        # Business Logic Layer
+│   │   ├── repository/     # Data Access (JDBC)
+│   │   ├── model/          # POJOs (Entities)
+│   │   └── db/             # Connection Management
+│   ├── resources/          # SQL Schema & Configuration
+│   └── pom.xml             # Maven Project Build
 └── README.md               # Project Hub
 ```
+
+---
+
+## ✨ Key Features
+
+### 🏢 Admin Management Portal
+- **Dashboard:** Real-time statistics and resort overview.
+- **Staff Management:** Complete CRUD for employee and admin accounts.
+- **Room Management:** Dynamic inventory control (types, prices, status).
+- **Reservation Control:** Unified view of all resort bookings.
+
+### 🛎️ Guest Services
+- **Luxury Landing Screen:** High-end introduction to the resort.
+- **Secure Authentication:** Multi-role login (Admin, Manager, Staff, User).
+- **Real-time Availability:** Smart room search and booking.
+- **Automated Billing:** Precision-calculated stays and invoice generation.
+
+### 🛡️ System Engineering
+- **Pure Java Stack:** Zero-dependency backend for ultra-low latency.
+- **Glassmorphism UI:** Premium aesthetic with smooth animations.
+- **Relational Integrity:** Strict MySQL/MariaDB schema enforcement.
 
 ---
 
 ## 🏁 Getting Started
 
 ### 1. Database Setup
-1. Ensure **MariaDB** is running.
-2. Initialize with `backend/resources/schema.sql`.
+1. Ensure **MariaDB** is installed and running.
+2. Initialize the database using:
+   ```bash
+   mariadb -u root -p < backend/resources/schema.sql
+   ```
 
 ### 2. Launch Backend
 ```bash
@@ -65,7 +95,7 @@ mvn clean compile
 mvn exec:java
 ```
 
-### 3. Launch Frontend
+### 3. Launch Frontend (Web)
 ```bash
 cd frontend
 flutter run -d chrome
@@ -73,49 +103,59 @@ flutter run -d chrome
 
 ---
 
-## ✨ Features
-- **Luxury Landing Screen:** High-end introduction to the resort system.
-- **Secure Authentication:** User login and registration integrated with backend.
-- **Real-time Room Availability:** Instant check for room status.
-- **Automated Billing:** Dynamic price calculation per night.
-- **Reservation Management:** Full CRUD operations for bookings.
-- **Luxury UX:** Beautifully crafted icons, gradients, and fonts for a premium feel.
-
----
-
 > [!TIP]
-> **Best Practices Maintained:** 
-> - **Separation of Concerns:** UI is decoupled from data logic via services.
-> - **Error Handling:** Robust try-catch blocks in both frontend and backend.
-> - **Consistency:** Unified naming conventions and clean code structure.
+> **Performance First:** This project avoids JavaScript entirely in the core logic path. The backend uses a custom socket-based HTTP handler to minimize overhead.
+
 > [!IMPORTANT]
-> This project is strictly restricted to **Flutter (Dart)** for the interface and **Pure Java** for the logic. High performance is achieved by avoiding unnecessary dependencies and JavaScript bloat.
+> **Architecture Rule:** UI must remain decoupled from data logic. Use the `api_service.dart` in the frontend and `Service` layers in the backend for all business operations.
 
 ---
 
-# Android Gravity & Flutter Layout Guide
-## Ocean View Resort Landing Screen
-
 ---
 
-## 🎯 GRAVITY CONCEPT IN FLUTTER
+## 📡 API Documentation
 
-Gravity in Android defines how content is positioned within a container.
-In Flutter, we use **Alignment**, **MainAxisAlignment**, and **CrossAxisAlignment**.
+The backend exposes a lightweight REST API. All endpoints return JSON and require `Content-Type: application/json`.
 
-### Android Gravity to Flutter Mapping
-
-| Android Gravity | Flutter Equivalent | Description |
+### 🔐 Authentication
+| Method | Endpoint | Description |
 |---|---|---|
-| `gravity="center"` | `Alignment.center` | Center both axes |
-| `gravity="center_horizontal"` | `Alignment.centerRight/centerLeft` | Center horizontal |
-| `gravity="center_vertical"` | `Alignment.centerRight/centerLeft` | Center vertical |
-| `gravity="top"` | `Alignment.topCenter` | Top alignment |
-| `gravity="bottom"` | `Alignment.bottomCenter` | Bottom alignment |
-| `gravity="left"` | `Alignment.centerLeft` | Left alignment |
-| `gravity="right"` | `Alignment.centerRight` | Right alignment |
-| `gravity="top\|left"` | `Alignment.topLeft` | Top-left corner |
-| `gravity="bottom\|right"` | `Alignment.bottomRight` | Bottom-right corner |
+| POST | `/api/auth/login` | Authenticate user & get role |
+| POST | `/api/auth/register` | Register a new guest account |
+
+### 👥 User Management
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/users` | List all system users |
+| GET | `/api/users/role/{ROLE}` | Filter users by role (ADMIN, MANAGER, etc) |
+| POST | `/api/admin/users` | Admin-only user creation |
+| PUT | `/api/users` | Update user details |
+| DELETE | `/api/users/{id}` | Remove a user account |
+
+### 🛌 Room Management
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/rooms?available=true` | List rooms (optional filtering) |
+| POST | `/api/rooms` | Create a new room entry |
+| PUT | `/api/rooms` | Update room data |
+| DELETE | `/api/rooms/{id}` | Remove a room from inventory |
+
+### 📅 Reservations
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/reservations` | List all bookings |
+| GET | `/api/reservations/{id}` | Get specific booking details |
+| GET | `/api/reservations/number/{num}` | Search by reservation number |
+| GET | `/api/reservations/guest/{id}` | List reservations for a guest |
+| GET | `/api/reservations/{id}/bill` | Generate billing information |
+| POST | `/api/reservations` | Create a new booking |
+| PUT | `/api/reservations/{id}` | Update booking status/dates |
+| DELETE | `/api/reservations/{id}` | Cancel a reservation |
+
+---
+
+# 📐 Android Gravity & Flutter Layout Guide
+> *Resource for maintaining layout consistency across the Ocean View Resort UI.*
 
 ---
 

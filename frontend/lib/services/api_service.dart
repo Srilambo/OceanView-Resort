@@ -209,4 +209,193 @@ class ApiService {
       throw Exception('Connection error: $e');
     }
   }
+
+  static Future<List<User>> getAllUsers() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/users'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => User.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<List<User>> getUsersByRole(String role) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/users/role/$role'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => User.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load users by role');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<List<Reservation>> getAllReservations() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/reservations'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => Reservation.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load all reservations');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // Admin User Management
+  static Future<void> deleteUser(String userId) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('$baseUrl/users/$userId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete user');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> updateUser(User user) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/users'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(user.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update user');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<User> adminCreateUser({
+    required String username,
+    required String password,
+    required String email,
+    required List<String> roles,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/admin/users'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'username': username,
+              'password': password,
+              'email': email,
+              'roles': roles,
+              'enabled': true,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return User.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to create user: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // Admin Room Management
+  static Future<Room> createRoom(Room room) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/rooms'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(room.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 201) {
+        return Room.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to create room');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Room> updateRoom(Room room) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/rooms'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(room.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return Room.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to update room');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> deleteRoom(String roomId) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('$baseUrl/rooms/$roomId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete room');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> updateReservationStatus(
+      String reservationId, String status) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/reservations/$reservationId'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'status': status}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update reservation status');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
 }

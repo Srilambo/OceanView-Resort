@@ -33,12 +33,36 @@ class UserModel {
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Handle roles list from backend
+    String extractedRole = 'GUEST';
+    if (json['roles'] != null) {
+      if (json['roles'] is List) {
+        List<dynamic> rolesList = json['roles'];
+        if (rolesList.contains('ADMIN') || rolesList.contains('ROLE_ADMIN')) {
+          extractedRole = 'ADMIN';
+        } else if (rolesList.contains('MANAGER') ||
+            rolesList.contains('ROLE_MANAGER')) {
+          extractedRole = 'MANAGER';
+        } else if (rolesList.contains('STAFF') ||
+            rolesList.contains('ROLE_STAFF')) {
+          extractedRole = 'STAFF';
+        } else if (rolesList.isNotEmpty) {
+          extractedRole = rolesList[0].toString();
+        }
+      } else if (json['roles'] is String) {
+        extractedRole = json['roles'];
+      }
+    } else if (json['role'] != null) {
+      extractedRole = json['role'];
+    }
+
     return UserModel(
-      id: json['id'] ?? json['user_id'] ?? '',
+      id: json['userId'] ?? json['user_id'] ?? json['id'] ?? '',
       username: json['username'] ?? '',
-      fullName: json['fullName'] ?? json['full_name'] ?? '',
+      fullName:
+          json['fullName'] ?? json['full_name'] ?? json['username'] ?? 'User',
       email: json['email'] ?? '',
-      role: json['role'] ?? 'GUEST',
+      role: extractedRole,
       enabled: json['enabled'] ?? true,
     );
   }

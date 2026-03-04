@@ -7,12 +7,14 @@ class SidebarNavigation extends StatefulWidget {
   final String currentRoute;
   final List<NavigationItem> items;
   final VoidCallback? onLogout;
+  final Function(String)? onRouteSelect;
 
   const SidebarNavigation({
     Key? key,
     required this.currentRoute,
     required this.items,
     this.onLogout,
+    this.onRouteSelect,
   }) : super(key: key);
 
   @override
@@ -142,56 +144,75 @@ class _SidebarNavigationState extends State<SidebarNavigation> {
     bool isActive,
   ) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            // Navigator.of(context).pushNamed(item.route); // Removed pushNamed to avoid errors
-            // In a real app, this would use the provided router
+            if (widget.onRouteSelect != null) {
+              widget.onRouteSelect!(item.route);
+            } else {
+              // Navigator.of(context).pushNamed(item.route);
+            }
           },
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: isActive
-                  ? const Color(0xFF1565C0).withOpacity(0.3)
+                  ? const Color(0xFF1E88E5).withOpacity(0.15)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
-              border: Border(
-                left: BorderSide(
-                  color:
-                      isActive ? const Color(0xFF1565C0) : Colors.transparent,
-                  width: 4,
-                ),
-              ),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
+            child: Stack(
               children: [
-                Icon(
-                  item.icon,
-                  color: isActive
-                      ? const Color(0xFF1565C0)
-                      : Colors.white.withOpacity(0.6),
-                  size: 22,
-                ),
-                if (!_isCollapsed) ...[
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      item.label,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w500,
-                        color: isActive
-                            ? const Color(0xFF1565C0)
-                            : Colors.white.withOpacity(0.8),
+                if (isActive)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 6,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1E88E5),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ],
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  child: Row(
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: isActive
+                            ? const Color(0xFF1E88E5)
+                            : Colors.white.withOpacity(0.7),
+                        size: 24,
+                      ),
+                      if (!_isCollapsed) ...[
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            item.label,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 15,
+                              fontWeight:
+                                  isActive ? FontWeight.w600 : FontWeight.w500,
+                              color: isActive
+                                  ? const Color(0xFF1E88E5)
+                                  : Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

@@ -39,4 +39,31 @@ public class RoomService {
             throw new Exception("Database error: " + e.getMessage());
         }
     }
+
+    public Room createRoom(Room room) throws Exception {
+        try {
+            if (room.getRoomId() == null || room.getRoomId().isEmpty()) {
+                room.setRoomId(java.util.UUID.randomUUID().toString());
+            }
+            return roomRepository.save(room);
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public Room updateRoom(Room room) throws Exception {
+        try {
+            return roomRepository.update(room);
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public void deleteRoom(String id) throws Exception {
+        try {
+            roomRepository.delete(id);
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
 }

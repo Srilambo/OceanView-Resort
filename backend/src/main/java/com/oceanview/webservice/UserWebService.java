@@ -79,4 +79,42 @@ public class UserWebService {
                 "Content-Length: " + body.length() + "\r\n" +
                 "\r\n" + body;
     }
+
+    public String getAllUsers() {
+        try {
+            java.util.List<User> users = userService.getAllUsers();
+            return buildJsonResponse(200, gson.toJson(users));
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String getUsersByRole(String role) {
+        try {
+            java.util.List<User> users = userService.getUsersByRole(role);
+            return buildJsonResponse(200, gson.toJson(users));
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String deleteUser(String userId) {
+        try {
+            userService.deleteUser(userId);
+            return buildJsonResponse(200, "{\"message\": \"User deleted successfully\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String updateUser(String jsonBody) {
+        try {
+            User user = gson.fromJson(jsonBody, User.class);
+            userService.updateUser(user);
+            return buildJsonResponse(200, "{\"message\": \"User updated successfully\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
 }
