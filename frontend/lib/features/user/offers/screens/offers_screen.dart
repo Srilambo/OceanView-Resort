@@ -25,32 +25,32 @@ class OffersScreen extends StatelessWidget {
               ),
             ),
           ),
-          SingleChildScrollView(
+          const SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const HeaderWidget(),
-                const _OffersHero(),
-                const SizedBox(height: 60),
+                HeaderWidget(),
+                _OffersHero(),
+                SizedBox(height: 60),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: [
-                      const _SectionHeader(
+                      _SectionHeader(
                         title: 'Exclusive Packages',
                         subtitle:
                             'Enhance your stay with our curated selection of special offers and seasonal packages.',
                       ),
-                      const SizedBox(height: 64),
-                      const _OfferCard(
+                      SizedBox(height: 64),
+                      _OfferCard(
                         title: 'Summer Sanctuary',
                         description:
                             'Book 5 nights or more and receive 20% off all spa treatments and a complimentary sunset dinner.',
                         discount: '20%',
                         imagePath: 'assets/images/luxury_pool.png',
                       ),
-                      const SizedBox(height: 32),
-                      const _OfferCard(
+                      SizedBox(height: 32),
+                      _OfferCard(
                         title: 'Honeymoon Bliss',
                         description:
                             'A romantic escape featuring champagne on arrival, a couples massage, and a private beach breakfast.',
@@ -58,8 +58,8 @@ class OffersScreen extends StatelessWidget {
                         isReversed: true,
                         imagePath: 'assets/images/room1_ocean_suite_img1.png',
                       ),
-                      const SizedBox(height: 32),
-                      const _OfferCard(
+                      SizedBox(height: 32),
+                      _OfferCard(
                         title: 'Early Bird Exclusive',
                         description:
                             'Plan your getaway at least 60 days in advance and receive an exclusive 15% discount on your entire stay.',
@@ -69,8 +69,8 @@ class OffersScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 100),
-                const FooterWidget(),
+                SizedBox(height: 100),
+                FooterWidget(),
               ],
             ),
           ),

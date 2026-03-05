@@ -5,7 +5,7 @@ import '../../../../models/reservation.dart';
 import '../../../../services/api_service.dart';
 
 class BookingManagementView extends StatefulWidget {
-  const BookingManagementView({Key? key}) : super(key: key);
+  const BookingManagementView({super.key});
 
   @override
   State<BookingManagementView> createState() => _BookingManagementViewState();

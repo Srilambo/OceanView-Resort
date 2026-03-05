@@ -6,7 +6,7 @@ import '../../../../services/api_service.dart';
 
 class TasksView extends StatefulWidget {
   final String? staffId; // If provided, shows tasks only for this staff member
-  const TasksView({Key? key, this.staffId}) : super(key: key);
+  const TasksView({super.key, this.staffId});
 
   @override
   State<TasksView> createState() => _TasksViewState();

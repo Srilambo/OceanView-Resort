@@ -1,3 +1,19 @@
+/// Parses an ISO-8601 datetime string robustly.
+/// Handles the legacy backend bug that produced duplicate fractional-second
+/// segments like "2026-03-18T14:00:00.000.000.0".
+DateTime _parseDate(String? raw) {
+  if (raw == null || raw.isEmpty) return DateTime.now();
+
+  // Remove duplicate fractional-second groups: keep only the first ".digits"
+  // after the seconds field. E.g. "14:00:00.000.000.0" → "14:00:00.000"
+  final cleaned = raw.replaceAllMapped(
+    RegExp(r'(\d{2}:\d{2}:\d{2})(\.\d+)(\.\d+)+'),
+    (m) => '${m[1]}${m[2]}',
+  );
+
+  return DateTime.parse(cleaned);
+}
+
 class Reservation {
   final String reservationId;
   final String reservationNumber;
@@ -45,17 +61,13 @@ class Reservation {
       guestName: json['guest']?['name'] ?? '',
       roomId: json['room']?['roomId'] ?? '',
       roomNumber: json['room']?['roomNumber'] ?? '',
-      checkInDate: DateTime.parse(
-        json['checkInDate'] ?? DateTime.now().toString(),
-      ),
-      checkOutDate: DateTime.parse(
-        json['checkOutDate'] ?? DateTime.now().toString(),
-      ),
+      checkInDate: _parseDate(json['checkInDate']),
+      checkOutDate: _parseDate(json['checkOutDate']),
       actualCheckIn: json['actualCheckIn'] != null
-          ? DateTime.parse(json['actualCheckIn'])
+          ? _parseDate(json['actualCheckIn'])
           : null,
       actualCheckOut: json['actualCheckOut'] != null
-          ? DateTime.parse(json['actualCheckOut'])
+          ? _parseDate(json['actualCheckOut'])
           : null,
       numberOfNights: json['numberOfNights'] ?? 0,
       totalCost: (json['totalCost'] as num?)?.toDouble() ?? 0.0,
@@ -118,14 +130,12 @@ class Bill {
       reservationNumber: json['reservationNumber'] ?? '',
       guestName: json['guestName'] ?? '',
       roomNumber: json['roomNumber'] ?? '',
-      checkInDate: DateTime.parse(json['checkInDate'] ?? ''),
-      checkOutDate: DateTime.parse(json['checkOutDate'] ?? ''),
+      checkInDate: _parseDate(json['checkInDate']),
+      checkOutDate: _parseDate(json['checkOutDate']),
       numberOfNights: json['numberOfNights'] ?? 0,
       pricePerNight: (json['pricePerNight'] as num?)?.toDouble() ?? 0.0,
       totalCost: (json['totalCost'] as num?)?.toDouble() ?? 0.0,
-      generatedAt: DateTime.parse(
-        json['generatedAt'] ?? DateTime.now().toString(),
-      ),
+      generatedAt: _parseDate(json['generatedAt']),
     );
   }
 }

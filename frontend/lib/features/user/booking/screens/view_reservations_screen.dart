@@ -217,7 +217,7 @@ class _ViewReservationsScreenState extends State<ViewReservationsScreen>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'RESERVATION',
                           style: TextStyle(
                             color: AppColors.textMuted,
@@ -342,7 +342,7 @@ class _ViewReservationsScreenState extends State<ViewReservationsScreen>
             ),
             Text(
               subtitle,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 12,
               ),
@@ -427,8 +427,8 @@ class _ViewReservationsScreenState extends State<ViewReservationsScreen>
         await ApiService.cancelReservation(reservationId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Reservation cancelled successfully'),
+            const SnackBar(
+              content: Text('Reservation cancelled successfully'),
               backgroundColor: AppColors.sageGreen,
             ),
           );

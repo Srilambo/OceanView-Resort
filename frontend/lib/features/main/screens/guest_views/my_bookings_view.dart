@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../../models/reservation.dart';
 import '../../../../services/api_service.dart';
+import '../../../authentication/providers/auth_provider.dart';
+import 'bill_screen.dart';
 
 class MyBookingsView extends StatefulWidget {
   const MyBookingsView({Key? key}) : super(key: key);
@@ -15,16 +18,39 @@ class _MyBookingsViewState extends State<MyBookingsView>
     with SingleTickerProviderStateMixin {
   late Future<List<Reservation>> _futureReservations;
   late AnimationController _animationController;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _futureReservations =
-        ApiService.getGuestReservations('guest-sri-001'); // Demo guest ID
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final user = authProvider.currentUser;
+
+      if (user != null) {
+        final guest = await ApiService.getGuestByUserId(user.id);
+        if (mounted) {
+          setState(() {
+            _futureReservations =
+                ApiService.getGuestReservations(guest.guestId);
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      debugPrint('Error loading bookings: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -35,6 +61,10 @@ class _MyBookingsViewState extends State<MyBookingsView>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return FutureBuilder<List<Reservation>>(
       future: _futureReservations,
       builder: (context, snapshot) {
@@ -42,9 +72,30 @@ class _MyBookingsViewState extends State<MyBookingsView>
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(
-            child: Text(
-              'Error loading bookings: ${snapshot.error}',
-              style: const TextStyle(color: Colors.red),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 60, color: Colors.red.shade300),
+                const SizedBox(height: 16),
+                Text(
+                  'Error loading bookings',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  snapshot.error.toString(),
+                  style: GoogleFonts.montserrat(color: Colors.grey.shade600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => setState(() => _initData()),
+                  child: const Text('Try Again'),
+                ),
+              ],
             ),
           );
         }
@@ -159,6 +210,8 @@ class _MyBookingsViewState extends State<MyBookingsView>
       switch (status) {
         case 'CONFIRMED':
           return Colors.green;
+        case 'CHECKED_IN':
+          return const Color(0xFF1565C0);
         case 'PENDING':
           return Colors.orange;
         case 'COMPLETED':
@@ -191,15 +244,20 @@ class _MyBookingsViewState extends State<MyBookingsView>
               Container(
                 width: 120,
                 height: 140,
-                color:
-                    isUpcoming ? const Color(0xFF1565C0) : Colors.grey.shade200,
+                color: (booking.status == 'CHECKED_IN' || isUpcoming)
+                    ? const Color(0xFF1565C0)
+                    : Colors.grey.shade200,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      isUpcoming ? Icons.hotel : Icons.history,
+                      (booking.status == 'CHECKED_IN' || isUpcoming)
+                          ? Icons.hotel
+                          : Icons.history,
                       size: 40,
-                      color: isUpcoming ? Colors.white : Colors.grey.shade400,
+                      color: (booking.status == 'CHECKED_IN' || isUpcoming)
+                          ? Colors.white
+                          : Colors.grey.shade400,
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -207,15 +265,18 @@ class _MyBookingsViewState extends State<MyBookingsView>
                       style: GoogleFonts.montserrat(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isUpcoming ? Colors.white : Colors.grey.shade600,
+                        color: (booking.status == 'CHECKED_IN' || isUpcoming)
+                            ? Colors.white
+                            : Colors.grey.shade600,
                       ),
                     ),
                     Text(
                       booking.checkInDate.year.toString(),
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
-                        color:
-                            isUpcoming ? Colors.white70 : Colors.grey.shade500,
+                        color: (booking.status == 'CHECKED_IN' || isUpcoming)
+                            ? Colors.white70
+                            : Colors.grey.shade500,
                       ),
                     ),
                   ],
@@ -297,19 +358,53 @@ class _MyBookingsViewState extends State<MyBookingsView>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Total Cost:',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Total Cost:',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '\$${booking.totalCost.toStringAsFixed(2)}',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFF57C00),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            '\$${booking.totalCost.toStringAsFixed(2)}',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFF57C00),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BillScreen(
+                                    reservationId: booking.reservationId,
+                                    reservationNumber:
+                                        booking.reservationNumber,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.receipt_long_rounded,
+                                size: 16),
+                            label: Text(
+                              'View Bill',
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF0D47A1),
+                              side: const BorderSide(color: Color(0xFF0D47A1)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                             ),
                           ),
                         ],
@@ -321,7 +416,29 @@ class _MyBookingsViewState extends State<MyBookingsView>
             ],
           ),
           // Upcoming marker
-          if (isUpcoming)
+          if (booking.status == 'CHECKED_IN')
+            Positioned(
+              left: 0,
+              top: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF2E7D32),
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'ACTIVE STAY',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            )
+          else if (isUpcoming)
             Positioned(
               left: 0,
               top: 0,

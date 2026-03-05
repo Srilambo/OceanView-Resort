@@ -250,6 +250,16 @@ public class HttpServer {
                 return reservationService.checkOut(id);
             }
 
+            if (path.matches("/api/reservations/[a-zA-Z0-9-]+/services") && method.equals("POST")) {
+                String id = path.substring("/api/reservations/".length(), path.indexOf("/services"));
+                return reservationService.addServiceToReservation(id, body);
+            }
+
+            if (path.matches("/api/reservations/[a-zA-Z0-9-]+/checkout-pay") && method.equals("POST")) {
+                String id = path.substring("/api/reservations/".length(), path.indexOf("/checkout-pay"));
+                return reservationService.checkOutWithPayment(id, body);
+            }
+
             // ========== Resort Services Endpoints ==========
             if (path.equals("/api/services") && method.equals("GET")) {
                 return resortServiceWebService.getAllServices();

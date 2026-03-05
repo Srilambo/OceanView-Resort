@@ -1,0 +1,31 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< com.oceanview:resort-booking-backend >----------------
+[INFO] Building Ocean View Resort Backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ resort-booking-backend ---
+[INFO] skip non existing resourceDirectory E:\ap\OceanView-Resort-main\backend\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ resort-booking-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- exec:3.1.0:java (default-cli) @ resort-booking-backend ---
+? Starting Ocean View Resort Backend...
+? MariaDB Driver loaded successfully!
+SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See https://www.slf4j.org/codes.html#noProviders for further details.
+? Database connection successful!
+? 'staff' and 'tasks' tables exist.
+? Total rooms: 5
+? Running SQL script: resources/update_db.sql
+? SQL script executed successfully!
+Server error: Address already in use: bind
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.412 s
+[INFO] Finished at: 2026-03-06T00:50:26+05:30
+[INFO] ------------------------------------------------------------------------

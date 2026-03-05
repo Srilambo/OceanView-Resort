@@ -5,7 +5,7 @@ import '../../../../models/user.dart';
 import '../../../../services/api_service.dart';
 
 class UserManagementView extends StatefulWidget {
-  const UserManagementView({Key? key}) : super(key: key);
+  const UserManagementView({super.key});
 
   @override
   State<UserManagementView> createState() => _UserManagementViewState();
@@ -68,7 +68,7 @@ class _UserManagementViewState extends State<UserManagementView> {
               obscureText: true,
             ),
             DropdownButtonFormField<String>(
-              value: selectedRole,
+              initialValue: selectedRole,
               items: const [
                 DropdownMenuItem(value: 'ROLE_ADMIN', child: Text('Admin')),
                 DropdownMenuItem(value: 'ROLE_STAFF', child: Text('Staff')),
@@ -315,7 +315,7 @@ class _UserManagementViewState extends State<UserManagementView> {
             color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             boxShadow: isSelected
-                ? [BoxShadow(color: Colors.black12, blurRadius: 4)]
+                ? [const BoxShadow(color: Colors.black12, blurRadius: 4)]
                 : null,
           ),
           margin: const EdgeInsets.all(4),

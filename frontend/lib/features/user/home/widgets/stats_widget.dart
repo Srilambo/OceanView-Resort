@@ -9,9 +9,9 @@ class StatsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 60),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: const [
+        children: [
           _StatItem(number: '50+', label: 'LUXURY ROOMS', index: 0),
           _StatItem(
               number: '4.9', label: 'GUEST RATING', icon: Icons.star, index: 1),
@@ -83,4 +83,3 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
-

@@ -86,48 +86,55 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: TopNavigationBar(
-        title: 'Staff Portal',
-        onMenuPressed: () {
-          _scaffoldKey.currentState?.openDrawer();
-        },
-      ),
-      drawer: Drawer(
-        child: SidebarNavigation(
-          currentRoute: _currentRoute,
-          items: staffNavItems,
-          onRouteSelect: (route) {
-            setState(() => _currentRoute = route);
-            if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-              Navigator.pop(context);
-            }
-          },
-        ),
-      ),
-      body: Row(
-        children: [
-          if (MediaQuery.of(context).size.width > 900)
-            SidebarNavigation(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isWide = constraints.maxWidth > 900;
+
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: TopNavigationBar(
+            title: 'Staff Portal',
+            onMenuPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
+          ),
+          drawer: Drawer(
+            child: SidebarNavigation(
               currentRoute: _currentRoute,
               items: staffNavItems,
               onRouteSelect: (route) {
                 setState(() => _currentRoute = route);
+                if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+                  Navigator.pop(context);
+                }
               },
             ),
-          Expanded(
-            child: Container(
-              color: Colors.grey.shade50,
-              child: _buildBodyContent(),
-            ),
           ),
-        ],
-      ),
+          body: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isWide)
+                SidebarNavigation(
+                  currentRoute: _currentRoute,
+                  items: staffNavItems,
+                  onRouteSelect: (route) {
+                    setState(() => _currentRoute = route);
+                  },
+                ),
+              Expanded(
+                child: Container(
+                  color: Colors.grey.shade50,
+                  child: _buildBodyContent(constraints),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent(BoxConstraints constraints) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -137,7 +144,7 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
 
     switch (_currentRoute) {
       case '/staff/home':
-        return _buildDashboardContent();
+        return _buildDashboardContent(constraints);
       case '/staff/checkin':
         return const CheckInView();
       case '/staff/checkout':
@@ -147,7 +154,7 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
       case '/staff/tasks':
         return const TasksView();
       default:
-        return _buildDashboardContent();
+        return _buildDashboardContent(constraints);
     }
   }
 
@@ -179,7 +186,8 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
     );
   }
 
-  Widget _buildDashboardContent() {
+  Widget _buildDashboardContent(BoxConstraints constraints) {
+    final width = constraints.maxWidth;
     final totalActive = _stats?['totalActiveStaff'] ?? 0;
     final frontDesk = _stats?['frontDesk'] ?? 0;
     final housekeeping = _stats?['housekeeping'] ?? 0;
@@ -200,9 +208,7 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
 
             // Summary Stats
             GridView.count(
-              crossAxisCount: MediaQuery.of(context).size.width > 900
-                  ? 3
-                  : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
+              crossAxisCount: width > 900 ? 3 : (width > 600 ? 2 : 1),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 16,

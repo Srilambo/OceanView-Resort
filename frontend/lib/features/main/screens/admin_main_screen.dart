@@ -80,31 +80,38 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           },
         ),
       ),
-      body: Row(
-        children: [
-          if (MediaQuery.of(context).size.width > 900)
-            SidebarNavigation(
-              currentRoute: _currentRoute,
-              items: adminNavItems,
-              onRouteSelect: (route) {
-                setState(() => _currentRoute = route);
-              },
-            ),
-          Expanded(
-            child: Container(
-              color: Colors.grey.shade50,
-              child: _buildBodyContent(),
-            ),
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isWide = constraints.maxWidth > 900;
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isWide)
+                SidebarNavigation(
+                  currentRoute: _currentRoute,
+                  items: adminNavItems,
+                  onRouteSelect: (route) {
+                    setState(() => _currentRoute = route);
+                  },
+                ),
+              Expanded(
+                child: Container(
+                  color: Colors.grey.shade50,
+                  child: _buildBodyContent(constraints),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent(BoxConstraints constraints) {
     switch (_currentRoute) {
       case '/admin/home':
-        return _buildDashboard();
+        return _buildDashboard(constraints);
       case '/admin/users':
         return const UserManagementView();
       case '/admin/rooms':
@@ -118,11 +125,13 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       case '/admin/settings':
         return const SettingsView();
       default:
-        return _buildDashboard();
+        return _buildDashboard(constraints);
     }
   }
 
-  Widget _buildDashboard() {
+  Widget _buildDashboard(BoxConstraints constraints) {
+    final double width = constraints.maxWidth;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -133,15 +142,12 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
           // KPI Cards
           GridView.count(
-            crossAxisCount: MediaQuery.of(context).size.width > 1200
-                ? 4
-                : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
+            crossAxisCount: width > 1200 ? 4 : (width > 600 ? 2 : 1),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio:
-                MediaQuery.of(context).size.width > 1200 ? 2.5 : 2.0,
+            childAspectRatio: width > 1200 ? 2.5 : 2.0,
             children: [
               _buildKPICard(
                   'Total Users', '250', Icons.people, const Color(0xFF1565C0)),
@@ -158,13 +164,12 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
           // Management Sections
           GridView.count(
-            crossAxisCount: MediaQuery.of(context).size.width > 900 ? 2 : 1,
+            crossAxisCount: width > 900 ? 2 : 1,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio:
-                MediaQuery.of(context).size.width > 900 ? 1.5 : 1.2,
+            childAspectRatio: width > 900 ? 1.5 : 1.2,
             children: [
               _buildManagementCard(
                 icon: Icons.person_add,

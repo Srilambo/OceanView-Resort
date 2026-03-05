@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ReportsView extends StatefulWidget {
-  const ReportsView({Key? key}) : super(key: key);
+  const ReportsView({super.key});
 
   @override
   State<ReportsView> createState() => _ReportsViewState();

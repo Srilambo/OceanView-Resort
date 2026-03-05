@@ -9,6 +9,8 @@ import 'guest_views/my_bookings_view.dart';
 import 'guest_views/services_view.dart';
 import 'guest_views/reviews_view.dart';
 import 'guest_views/my_profile_view.dart';
+import 'guest_views/bill_screen.dart';
+import '../../../services/api_service.dart';
 
 class GuestMainScreen extends StatefulWidget {
   const GuestMainScreen({Key? key}) : super(key: key);
@@ -73,43 +75,48 @@ class _GuestMainScreenState extends State<GuestMainScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 900;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isWide = constraints.maxWidth > 900;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF8F9FC),
-      appBar: TopNavigationBar(
-        title: _getPageTitle(),
-        onMenuPressed: () => _scaffoldKey.currentState?.openDrawer(),
-      ),
-      drawer: Drawer(
-        child: SidebarNavigation(
-          currentRoute: _currentRoute,
-          items: guestNavItems,
-          onRouteSelect: (route) {
-            _navigate(route);
-            if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-              Navigator.pop(context);
-            }
-          },
-        ),
-      ),
-      body: Row(
-        children: [
-          if (isWide)
-            SidebarNavigation(
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: const Color(0xFFF8F9FC),
+          appBar: TopNavigationBar(
+            title: _getPageTitle(),
+            onMenuPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          ),
+          drawer: Drawer(
+            child: SidebarNavigation(
               currentRoute: _currentRoute,
               items: guestNavItems,
-              onRouteSelect: _navigate,
-            ),
-          Expanded(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: _buildBodyContent(),
+              onRouteSelect: (route) {
+                _navigate(route);
+                if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+                  Navigator.pop(context);
+                }
+              },
             ),
           ),
-        ],
-      ),
+          body: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isWide)
+                SidebarNavigation(
+                  currentRoute: _currentRoute,
+                  items: guestNavItems,
+                  onRouteSelect: _navigate,
+                ),
+              Expanded(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: _buildBodyContent(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -153,54 +160,91 @@ class _GuestMainScreenState extends State<GuestMainScreen>
 
   Widget _buildDashboard() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final username = authProvider.currentUser?.username ?? 'Guest';
+    final user = authProvider.currentUser;
+    final username = user?.username ?? 'Guest';
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ─── Hero Welcome Banner ──────────────────────────────────────────
-          _buildWelcomeBanner(username),
-          const SizedBox(height: 36),
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: user != null ? _fetchActiveStayInfo(user.id) : Future.value(null),
+      builder: (context, snapshot) {
+        final stayInfo = snapshot.data;
 
-          // ─── Stats Row ────────────────────────────────────────────────────
-          _buildStatsRow(),
-          const SizedBox(height: 36),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── Hero Welcome Banner ──────────────────────────────────────────
+              _buildWelcomeBanner(username, stayInfo),
+              const SizedBox(height: 36),
 
-          // ─── Quick Actions ────────────────────────────────────────────────
-          _buildSectionTitle('Quick Actions', Icons.bolt_rounded),
-          const SizedBox(height: 20),
-          _buildQuickActions(),
-          const SizedBox(height: 36),
+              // ─── Stats Row ────────────────────────────────────────────────────
+              _buildStatsRow(),
+              const SizedBox(height: 36),
 
-          // ─── Featured Rooms & What's Available ───────────────────────────
-          _buildSectionTitle(
-              'Featured Experiences', Icons.auto_awesome_rounded),
-          const SizedBox(height: 20),
-          _buildFeaturedCards(),
-          const SizedBox(height: 36),
+              // ─── Quick Actions ────────────────────────────────────────────────
+              _buildSectionTitle('Quick Actions', Icons.bolt_rounded),
+              const SizedBox(height: 20),
+              _buildQuickActions(),
+              const SizedBox(height: 36),
 
-          // ─── Stay Highlights ─────────────────────────────────────────────
-          _buildSectionTitle('Resort Highlights', Icons.star_rounded),
-          const SizedBox(height: 20),
-          _buildResortHighlights(),
-          const SizedBox(height: 16),
-        ],
-      ),
+              // ─── Featured Rooms & What's Available ───────────────────────────
+              _buildSectionTitle(
+                  'Featured Experiences', Icons.auto_awesome_rounded),
+              const SizedBox(height: 20),
+              _buildFeaturedCards(),
+              const SizedBox(height: 36),
+
+              // ─── Stay Highlights ─────────────────────────────────────────────
+              _buildSectionTitle('Resort Highlights', Icons.star_rounded),
+              const SizedBox(height: 20),
+              _buildResortHighlights(),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  Future<Map<String, dynamic>?> _fetchActiveStayInfo(String userId) async {
+    try {
+      final guest = await ApiService.getGuestByUserId(userId);
+      final reservations = await ApiService.getGuestReservations(guest.guestId);
+      final active =
+          reservations.where((r) => r.status == 'CHECKED_IN').toList();
+
+      if (active.isNotEmpty) {
+        final res = active.first;
+        final bill = await ApiService.getBillDetails(res.reservationId);
+        return {
+          'reservation': res,
+          'bill': bill,
+        };
+      }
+    } catch (_) {}
+    return null;
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Welcome Banner
   // ─────────────────────────────────────────────────────────────────────────────
-  Widget _buildWelcomeBanner(String username) {
+  Widget _buildWelcomeBanner(String username, Map<String, dynamic>? stayInfo) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 36),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0D47A1), Color(0xFF1565C0), Color(0xFF1976D2)],
+        gradient: LinearGradient(
+          colors: stayInfo != null
+              ? [
+                  const Color(0xFF1B5E20),
+                  const Color(0xFF2E7D32),
+                  const Color(0xFF388E3C)
+                ]
+              : [
+                  const Color(0xFF0D47A1),
+                  const Color(0xFF1565C0),
+                  const Color(0xFF1976D2)
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -219,32 +263,39 @@ class _GuestMainScreenState extends State<GuestMainScreen>
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildBannerText(username),
+                  _buildBannerText(username, stayInfo),
                   const SizedBox(height: 24),
-                  _buildBannerIcon(),
-                  const SizedBox(height: 24),
-                  _buildBannerButton()
+                  Row(
+                    children: [
+                      _buildBannerIcon(stayInfo),
+                      const SizedBox(width: 24),
+                      _buildBannerButton(stayInfo)
+                    ],
+                  ),
                 ],
               )
             : Row(
                 children: [
-                  Expanded(child: _buildBannerText(username)),
+                  Expanded(child: _buildBannerText(username, stayInfo)),
                   const SizedBox(width: 32),
-                  _buildBannerIcon(),
+                  _buildBannerIcon(stayInfo),
                   const SizedBox(width: 32),
-                  _buildBannerButton(),
+                  _buildBannerButton(stayInfo),
                 ],
               );
       }),
     );
   }
 
-  Widget _buildBannerText(String username) {
+  Widget _buildBannerText(String username, Map<String, dynamic>? stayInfo) {
+    final bool isCheckedIn = stayInfo != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Welcome back, $username! 👋',
+          isCheckedIn
+              ? 'Welcome Home, $username! 🏨'
+              : 'Welcome back, $username! 👋',
           style: GoogleFonts.playfairDisplay(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -253,7 +304,9 @@ class _GuestMainScreenState extends State<GuestMainScreen>
         ),
         const SizedBox(height: 10),
         Text(
-          'Your luxury escape at Ocean View Resort awaits.\nExplore rooms, services, and more below.',
+          isCheckedIn
+              ? 'You are currently checked into Room ${stayInfo['reservation'].roomNumber}.\nYour current bill total is \$${(stayInfo['bill']['grandTotal'] as num).toStringAsFixed(2)}.'
+              : 'Your luxury escape at Ocean View Resort awaits.\nExplore rooms, services, and more below.',
           style: GoogleFonts.montserrat(
             fontSize: 14,
             color: Colors.white.withOpacity(0.85),
@@ -264,7 +317,8 @@ class _GuestMainScreenState extends State<GuestMainScreen>
     );
   }
 
-  Widget _buildBannerIcon() {
+  Widget _buildBannerIcon(Map<String, dynamic>? stayInfo) {
+    final isCheckedIn = stayInfo != null;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -272,25 +326,49 @@ class _GuestMainScreenState extends State<GuestMainScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
-      child: const Icon(Icons.waves_rounded, size: 52, color: Colors.white),
+      child: Icon(
+          isCheckedIn ? Icons.receipt_long_rounded : Icons.waves_rounded,
+          size: 52,
+          color: Colors.white),
     );
   }
 
-  Widget _buildBannerButton() {
+  Widget _buildBannerButton(Map<String, dynamic>? stayInfo) {
+    final isCheckedIn = stayInfo != null;
     return ElevatedButton.icon(
-      onPressed: () => _navigate('/guest/rooms'),
-      icon: const Icon(Icons.search_rounded, size: 18),
+      onPressed: () {
+        if (isCheckedIn) {
+          _showActiveBill(stayInfo);
+        } else {
+          _navigate('/guest/rooms');
+        }
+      },
+      icon: Icon(isCheckedIn ? Icons.visibility_rounded : Icons.search_rounded,
+          size: 18),
       label: Text(
-        'Browse Rooms',
+        isCheckedIn ? 'View My Bill' : 'Browse Rooms',
         style:
             GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0D47A1),
+        foregroundColor:
+            isCheckedIn ? const Color(0xFF1B5E20) : const Color(0xFF0D47A1),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         elevation: 0,
+      ),
+    );
+  }
+
+  void _showActiveBill(Map<String, dynamic> stayInfo) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BillScreen(
+          reservationId: stayInfo['reservation'].reservationId,
+          reservationNumber: stayInfo['reservation'].reservationNumber,
+        ),
       ),
     );
   }
@@ -793,39 +871,36 @@ class _GuestMainScreenState extends State<GuestMainScreen>
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
+                          color: color.withOpacity(0.1),
+                          shape: BoxShape.circle,
                         ),
                         child:
-                            Icon(h['icon'] as IconData, color: color, size: 24),
+                            Icon(h['icon'] as IconData, color: color, size: 20),
                       ),
-                      const SizedBox(height: 8),
-                      FittedBox(
-                        child: Text(
-                          h['label'] as String,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A2E),
-                          ),
+                      const Spacer(),
+                      Text(
+                        h['label'] as String,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1A2E),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
-                      FittedBox(
-                        child: Text(
-                          h['sub'] as String,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 9,
-                            color: Colors.grey.shade600,
-                          ),
+                      Text(
+                        h['sub'] as String,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          color: Colors.grey.shade600,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -838,34 +913,18 @@ class _GuestMainScreenState extends State<GuestMainScreen>
     });
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Section Title
-  // ─────────────────────────────────────────────────────────────────────────────
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0D47A1), Color(0xFF1565C0)],
-            ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.white, size: 18),
-        ),
+        Icon(icon, color: const Color(0xFF0D47A1), size: 22),
         const SizedBox(width: 12),
         Text(
           title,
-          style: GoogleFonts.montserrat(
+          style: GoogleFonts.playfairDisplay(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: const Color(0xFF1A1A2E),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Container(height: 1.5, color: Colors.grey.shade200),
         ),
       ],
     );

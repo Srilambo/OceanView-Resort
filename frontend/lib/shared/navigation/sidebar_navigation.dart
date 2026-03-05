@@ -29,7 +29,7 @@ class _SidebarNavigationState extends State<SidebarNavigation> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: _isCollapsed ? 80 : 280,
-      height: MediaQuery.of(context).size.height,
+      // Removed height: MediaQuery.of(context).size.height to allow parent constraint (Row) to handle it
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         boxShadow: [

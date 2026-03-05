@@ -5,7 +5,7 @@ import '../../../../models/review.dart';
 import '../../../../services/api_service.dart';
 
 class ReviewsView extends StatefulWidget {
-  const ReviewsView({Key? key}) : super(key: key);
+  const ReviewsView({super.key});
 
   @override
   State<ReviewsView> createState() => _ReviewsViewState();

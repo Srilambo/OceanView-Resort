@@ -51,27 +51,27 @@ class RoomsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 48),
                       const _RoomCard(
-                        title: 'Ocean View Suite',
+                        title: 'Ocean View Suite (Suite 202)',
                         description:
                             'Wake up to the sound of waves in our premier suite featuring a private balcony and panoramic ocean views.',
-                        price: '450',
+                        price: '350',
                         imagePath: 'assets/images/room1_ocean_suite_img2.png',
                       ),
                       const SizedBox(height: 32),
                       const _RoomCard(
-                        title: 'Garden Deluxe',
+                        title: 'Garden Deluxe (Room 101)',
                         description:
                             'A serene escape surrounded by lush tropical greenery, perfect for those seeking tranquility.',
-                        price: '320',
+                        price: '150',
                         isReversed: true,
                         imagePath: 'assets/images/room2_garden_deluxe_img1.png',
                       ),
                       const SizedBox(height: 32),
                       const _RoomCard(
-                        title: 'Presidential Villa',
+                        title: 'Presidential Penthouse (Room 401)',
                         description:
                             'The pinnacle of luxury. Private pool, butler service, and the most expansive views in the resort.',
-                        price: '1,200',
+                        price: '800',
                         imagePath:
                             'assets/images/room3_presidential_suite_img1.png',
                       ),
