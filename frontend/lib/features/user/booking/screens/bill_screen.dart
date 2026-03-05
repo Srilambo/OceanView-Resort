@@ -306,7 +306,7 @@ class _BillScreenState extends State<BillScreen> with TickerProviderStateMixin {
         const SizedBox(height: 4),
         Text(
           'Official Invoice - #${_bill!.reservationNumber}',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
         ),
       ],
     );
@@ -363,7 +363,7 @@ class _BillScreenState extends State<BillScreen> with TickerProviderStateMixin {
   Widget _buildReceiptFooter() {
     return Column(
       children: [
-        Text(
+        const Text(
           'Thank you for staying with us.',
           style: TextStyle(
               color: AppColors.textMuted, fontStyle: FontStyle.italic),
@@ -385,7 +385,7 @@ class _BillScreenState extends State<BillScreen> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
           Text(value,
               style: const TextStyle(
                   color: AppColors.textLight,

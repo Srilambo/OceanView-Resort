@@ -156,6 +156,19 @@ CREATE TABLE IF NOT EXISTS resort_services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ========== Reservation Services (Add-to-Bill) ==========
+CREATE TABLE IF NOT EXISTS reservation_services (
+    id VARCHAR(50) PRIMARY KEY,
+    reservation_id VARCHAR(50) NOT NULL,
+    service_id VARCHAR(50) NOT NULL,
+    service_name VARCHAR(100) NOT NULL,
+    service_price DECIMAL(10, 2) NOT NULL,
+    quantity INT DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES resort_services(service_id)
+);
+
 -- ========== Reviews Table ==========
 CREATE TABLE IF NOT EXISTS reviews (
     review_id VARCHAR(50) PRIMARY KEY,

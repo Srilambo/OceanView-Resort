@@ -4,7 +4,7 @@ import '../../../../models/room.dart';
 import '../../../../services/api_service.dart';
 
 class RoomStatusView extends StatefulWidget {
-  const RoomStatusView({Key? key}) : super(key: key);
+  const RoomStatusView({super.key});
 
   @override
   State<RoomStatusView> createState() => _RoomStatusViewState();
@@ -420,12 +420,12 @@ class _RoomStatusViewState extends State<RoomStatusView> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return const Center(
       child: Column(
         children: [
-          const Icon(Icons.hotel_class, color: Colors.grey, size: 48),
-          const SizedBox(height: 16),
-          const Text('No rooms found matching the filter.'),
+          Icon(Icons.hotel_class, color: Colors.grey, size: 48),
+          SizedBox(height: 16),
+          Text('No rooms found matching the filter.'),
         ],
       ),
     );

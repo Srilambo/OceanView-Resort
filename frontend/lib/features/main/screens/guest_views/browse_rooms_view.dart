@@ -7,7 +7,7 @@ import '../../../../services/api_service.dart';
 import '../../../authentication/providers/auth_provider.dart';
 
 class BrowseRoomsView extends StatefulWidget {
-  const BrowseRoomsView({Key? key}) : super(key: key);
+  const BrowseRoomsView({super.key});
 
   @override
   State<BrowseRoomsView> createState() => _BrowseRoomsViewState();
@@ -696,11 +696,16 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
     final typeColor = _getRoomTypeColor(room.roomType);
     int selectedGuests = 1;
 
-    // Initialize with default times (e.g., today 2 PM for check-in, tomorrow 11 AM for check-out)
-    DateTime checkIn =
-        DateTime.now().add(const Duration(hours: 14 - 20)); // Adjust to 2 PM
-    if (checkIn.hour < 14) {
-      checkIn = DateTime(checkIn.year, checkIn.month, checkIn.day, 14, 0);
+    // Initialize with tomorrow 2 PM for check-in, day after at 11 AM for check-out
+    final DateTime now = DateTime.now();
+    DateTime checkIn;
+    if (now.hour < 14) {
+      // Still before 2 PM today — use today 2 PM
+      checkIn = DateTime(now.year, now.month, now.day, 14, 0);
+    } else {
+      // Past 2 PM — use tomorrow 2 PM to avoid the "in the past" validation
+      final tomorrow = now.add(const Duration(days: 1));
+      checkIn = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 14, 0);
     }
     DateTime checkOut = checkIn.add(const Duration(days: 1));
     checkOut = DateTime(checkOut.year, checkOut.month, checkOut.day, 11, 0);
@@ -714,9 +719,10 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
         builder: (context, setState) {
           double totalCost =
               room.pricePerNight * checkOut.difference(checkIn).inDays;
-          if (totalCost <= 0)
+          if (totalCost <= 0) {
             totalCost =
                 room.pricePerNight; // Minimum 1 night cost for small durations
+          }
           Future<void> selectDateTime(bool isCheckIn) async {
             final DateTime? pickedDate = await showDatePicker(
               context: context,

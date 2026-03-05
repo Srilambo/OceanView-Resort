@@ -9,11 +9,11 @@ class TopNavigationBar extends StatelessWidget implements PreferredSizeWidget {
   final List<PopupMenuItem>? actions;
 
   const TopNavigationBar({
-    Key? key,
+    super.key,
     required this.title,
     this.onMenuPressed,
     this.actions,
-  }) : super(key: key);
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(64);

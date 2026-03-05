@@ -9,7 +9,7 @@ import '../../features/main/screens/guest_main_screen.dart';
 import '../../features/authentication/models/user_role.dart';
 
 class AppNavigation extends StatelessWidget {
-  const AppNavigation({Key? key}) : super(key: key);
+  const AppNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {

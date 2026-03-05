@@ -121,6 +121,36 @@ public class ReservationWebService {
         }
     }
 
+    public String addServiceToReservation(String id, String jsonBody) {
+        try {
+            Map<String, Object> data = gson.fromJson(jsonBody,
+                    new com.google.gson.reflect.TypeToken<Map<String, Object>>() {
+                    }.getType());
+            String serviceId = (String) data.get("serviceId");
+            String serviceName = (String) data.get("serviceName");
+            double servicePrice = ((Number) data.get("servicePrice")).doubleValue();
+            int quantity = data.containsKey("quantity") ? ((Number) data.get("quantity")).intValue() : 1;
+            reservationService.addServiceToReservation(id, serviceId, serviceName, servicePrice, quantity);
+            return buildJsonResponse(200,
+                    "{\"message\": \"Service added to bill\", \"reservationId\": \"" + id + "\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String checkOutWithPayment(String id, String jsonBody) {
+        try {
+            Map<String, Object> data = gson.fromJson(jsonBody,
+                    new com.google.gson.reflect.TypeToken<Map<String, Object>>() {
+                    }.getType());
+            String paymentMethod = data.containsKey("paymentMethod") ? (String) data.get("paymentMethod") : "CASH";
+            Map<String, Object> bill = reservationService.checkOutWithPayment(id, paymentMethod);
+            return buildJsonResponse(200, gson.toJson(bill));
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
     private String buildJsonResponse(int statusCode, String body) {
         String statusText;
         switch (statusCode) {

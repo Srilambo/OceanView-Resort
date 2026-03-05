@@ -121,7 +121,7 @@ public class ReservationRepository {
                 "JOIN guests g ON r.guest_id = g.guest_id " +
                 "JOIN rooms rm ON r.room_id = rm.room_id " +
                 "WHERE r.room_id = ? " +
-                "AND r.status != 'CANCELLED' " +
+                "AND r.status NOT IN ('CANCELLED', 'COMPLETED') " +
                 "AND r.check_out_date > ? " +
                 "AND r.check_in_date < ?";
 
@@ -257,6 +257,10 @@ public class ReservationRepository {
         Timestamp actualCheckOut = rs.getTimestamp("actual_check_out");
         if (actualCheckOut != null)
             res.setActualCheckOut(actualCheckOut.toLocalDateTime());
+
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        if (createdAt != null)
+            res.setCreatedAt(createdAt.toLocalDateTime());
 
         return res;
     }

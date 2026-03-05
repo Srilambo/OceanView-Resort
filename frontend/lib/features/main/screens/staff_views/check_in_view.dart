@@ -4,7 +4,7 @@ import '../../../../models/reservation.dart';
 import '../../../../services/api_service.dart';
 
 class CheckInView extends StatefulWidget {
-  const CheckInView({Key? key}) : super(key: key);
+  const CheckInView({super.key});
 
   @override
   State<CheckInView> createState() => _CheckInViewState();
@@ -104,8 +104,8 @@ class _CheckInViewState extends State<CheckInView> {
                         leading: CircleAvatar(
                           backgroundColor:
                               const Color(0xFF1565C0).withOpacity(0.1),
-                          child: Icon(Icons.person,
-                              color: const Color(0xFF1565C0)),
+                          child: const Icon(Icons.person,
+                              color: Color(0xFF1565C0)),
                         ),
                         title: Text(
                           res.guestName,

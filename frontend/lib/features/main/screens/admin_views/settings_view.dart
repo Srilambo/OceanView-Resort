@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsView extends StatefulWidget {
-  const SettingsView({Key? key}) : super(key: key);
+  const SettingsView({super.key});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -134,7 +134,7 @@ class _SettingsViewState extends State<SettingsView> {
               color: Colors.grey.shade600, fontSize: 13)),
       value: value,
       onChanged: onChanged,
-      activeColor: const Color(0xFF1565C0),
+      activeThumbColor: const Color(0xFF1565C0),
     );
   }
 

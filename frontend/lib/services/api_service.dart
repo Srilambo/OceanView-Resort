@@ -762,4 +762,77 @@ class ApiService {
       throw Exception('Connection error: $e');
     }
   }
+
+  // ========== Service Billing ==========
+
+  static Future<void> addServiceToReservation({
+    required String reservationId,
+    required String serviceId,
+    required String serviceName,
+    required double servicePrice,
+    int quantity = 1,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/reservations/$reservationId/services'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'serviceId': serviceId,
+              'serviceName': serviceName,
+              'servicePrice': servicePrice,
+              'quantity': quantity,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        final err = jsonDecode(response.body);
+        throw Exception(err['error'] ?? 'Failed to add service to bill');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> getBillDetails(
+      String reservationId) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/reservations/$reservationId/bill'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to get bill');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkOutWithPayment({
+    required String reservationId,
+    required String paymentMethod,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/reservations/$reservationId/checkout-pay'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'paymentMethod': paymentMethod}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        final err = jsonDecode(response.body);
+        throw Exception(err['error'] ?? 'Failed to checkout');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
 }

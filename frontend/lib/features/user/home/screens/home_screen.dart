@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'OCEAN VIEW',
               style: TextStyle(
                 color: AppColors.goldAccent,
@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             border: Border.all(color: AppColors.glassBorder),
           ),
           child: PopupMenuButton<String>(
-            icon: Icon(Icons.person_outline, color: AppColors.goldAccent),
+            icon: const Icon(Icons.person_outline, color: AppColors.goldAccent),
             offset: const Offset(0, 50),
             color: AppColors.darkBgSecondary,
             shape:
@@ -159,13 +159,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'profile',
                 child: Row(
                   children: [
                     Icon(Icons.account_circle_outlined,
                         size: 20, color: AppColors.textLight),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Text('Profile',
                         style: TextStyle(color: AppColors.textLight)),
                   ],
@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(height: 4),
                     Text(
                       widget.user.email,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 14,
                       ),
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       const SizedBox(height: 6),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 12,
                         ),
@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             color: AppColors.goldAccent.withOpacity(0.2),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'Experience the Pinnacle of Luxury',
             style: TextStyle(
               color: AppColors.textMuted,

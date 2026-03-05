@@ -25,6 +25,24 @@ public class UserRepository {
         return null;
     }
 
+    public User findById(String userId) throws SQLException {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setRoles(getUserRoles(user.getUserId()));
+                return user;
+            }
+        }
+        return null;
+    }
+
     public boolean save(User user, Set<String> roles) throws SQLException {
         String sql = "INSERT INTO users (user_id, username, password, email, enabled) VALUES (?, ?, ?, ?, ?)";
 

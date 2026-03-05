@@ -2,6 +2,7 @@ ALTER TABLE staff ADD COLUMN IF NOT EXISTS address TEXT;
 ALTER TABLE staff ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE staff ADD COLUMN IF NOT EXISTS emergency_contact VARCHAR(100);
 
+ALTER TABLE guests ADD COLUMN IF NOT EXISTS user_id VARCHAR(50);
 ALTER TABLE guests ADD COLUMN IF NOT EXISTS id_type VARCHAR(50);
 ALTER TABLE guests ADD COLUMN IF NOT EXISTS id_number VARCHAR(50);
 ALTER TABLE guests ADD COLUMN IF NOT EXISTS nationality VARCHAR(50);
@@ -56,6 +57,19 @@ CREATE TABLE IF NOT EXISTS resort_services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ========== Reservation Services (Add-to-Bill) ==========
+CREATE TABLE IF NOT EXISTS reservation_services (
+    id VARCHAR(50) PRIMARY KEY,
+    reservation_id VARCHAR(50) NOT NULL,
+    service_id VARCHAR(50) NOT NULL,
+    service_name VARCHAR(100) NOT NULL,
+    service_price DECIMAL(10, 2) NOT NULL,
+    quantity INT DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES resort_services(service_id)
+);
+
 -- ========== Reviews Table ==========
 CREATE TABLE IF NOT EXISTS reviews (
     review_id VARCHAR(50) PRIMARY KEY,
@@ -68,24 +82,43 @@ CREATE TABLE IF NOT EXISTS reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ========== Guest user 'sri' (IDs normalised to user-002 / guest-002) ==========
+-- ========== DEV DB CLEANUP ==========
+-- Wipe ALL reservations for fresh testing
+DELETE FROM reservations;
+-- Remove the randomly generated test rooms created by the UI
+DELETE FROM rooms WHERE room_id NOT IN ('room-101', 'room-102', 'room-201', 'room-202', 'room-401');
+-- Ensure official rooms are available
+UPDATE rooms SET available = TRUE;
+
+-- ========== Guest user 'sri' ==========
+-- Use REPLACE to ensure user-002 exists with updated credentials
 REPLACE INTO users (user_id, username, password, email) VALUES
 ('user-002', 'sri', 'sri123', 'sri@oceanview.com');
 
 REPLACE INTO user_roles (user_id, role) VALUES
 ('user-002', 'ROLE_USER');
 
-INSERT INTO guests (guest_id, user_id, name, email, contact_number, address, id_type, id_number, nationality) VALUES
-('guest-002', 'user-002', 'Sri Kumar', 'sri@oceanview.com', '+94771112233', '42 Beach Road, Colombo', 'Passport', 'N1234567', 'Sri Lankan')
-ON DUPLICATE KEY UPDATE user_id='user-002', name='Sri Kumar';
+-- guest-sri-001 already holds 'sri@oceanview.com', so inserting guest-sri-001 with the
+-- same email should replace any existing guest row for that email to ensure the ID matches.
+REPLACE INTO guests (guest_id, name, email, contact_number, address, id_type, id_number, nationality, user_id) VALUES
+('guest-sri-001', 'Sri Kumar', 'sri@oceanview.com', '+94771112233', '42 Beach Road, Colombo', 'Passport', 'N1234567', 'Sri Lankan', 'user-002');
 
--- ========== Demo Reservations (using normalised guest-002) ==========
+-- Ensure all seed rooms exist (required before reservations FK can be satisfied)
+INSERT INTO rooms (room_id, room_number, room_type, capacity, price_per_night, description, available, status) VALUES
+('room-101', '101', 'DELUXE', 2, 150.00, 'Spacious deluxe room with breathtaking ocean views.', TRUE, 'AVAILABLE'),
+('room-102', '102', 'STANDARD', 2, 100.00, 'Cozy standard room with garden views.', TRUE, 'AVAILABLE'),
+('room-201', '201', 'SUITE', 4, 300.00, 'Luxurious presidential suite with panoramic ocean views.', TRUE, 'AVAILABLE'),
+('room-202', '202', 'SUITE', 4, 350.00, 'Elegant honeymoon suite.', TRUE, 'AVAILABLE'),
+('room-401', '401', 'PENTHOUSE', 4, 800.00, 'The crown jewel of Ocean View Resort.', TRUE, 'AVAILABLE')
+ON DUPLICATE KEY UPDATE room_number=room_number;
+
+-- ========== Demo Reservations (use guest-sri-001 — the actual guest row for 'sri') ==========
 INSERT INTO reservations (reservation_id, reservation_number, guest_id, room_id, check_in_date, check_out_date, number_of_nights, total_cost, status, special_requests) VALUES
-('res-001', 'RES-20260315', 'guest-002', 'room-101', '2026-03-15', '2026-03-18', 3, 450.00, 'CONFIRMED', 'Late check-in around 10 PM. Extra pillows please.'),
-('res-002', 'RES-20260401', 'guest-002', 'room-202', '2026-04-01', '2026-04-05', 4, 1400.00, 'PENDING', 'Anniversary trip - please arrange flowers and champagne.'),
-('res-003', 'RES-20260210', 'guest-002', 'room-102', '2026-02-10', '2026-02-12', 2, 200.00, 'COMPLETED', 'No special requests.'),
-('res-004', 'RES-20260120', 'guest-002', 'room-201', '2026-01-20', '2026-01-25', 5, 1500.00, 'COMPLETED', 'Need baby crib and high chair.'),
-('res-005', 'RES-20260501', 'guest-002', 'room-401', '2026-05-01', '2026-05-04', 3, 2400.00, 'PENDING', 'Penthouse stay for birthday celebration.')
+('res-001', 'RES-20260315', 'guest-sri-001', 'room-101', '2026-03-15', '2026-03-18', 3, 450.00, 'CONFIRMED', 'Late check-in around 10 PM. Extra pillows please.'),
+('res-002', 'RES-20260401', 'guest-sri-001', 'room-202', '2026-04-01', '2026-04-05', 4, 1400.00, 'PENDING', 'Anniversary trip - please arrange flowers and champagne.'),
+('res-003', 'RES-20260210', 'guest-sri-001', 'room-102', '2026-02-10', '2026-02-12', 2, 200.00, 'COMPLETED', 'No special requests.'),
+('res-004', 'RES-20260120', 'guest-sri-001', 'room-201', '2026-01-20', '2026-01-25', 5, 1500.00, 'COMPLETED', 'Need baby crib and high chair.'),
+('res-005', 'RES-20260501', 'guest-sri-001', 'room-401', '2026-05-01', '2026-05-04', 3, 2400.00, 'PENDING', 'Penthouse stay for birthday celebration.')
 ON DUPLICATE KEY UPDATE reservation_number=reservation_number;
 
 -- ========== Demo Resort Services ==========

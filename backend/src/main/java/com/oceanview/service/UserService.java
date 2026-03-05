@@ -132,7 +132,24 @@ public class UserService {
 
     public Guest getGuestByUserId(String userId) throws Exception {
         try {
-            return guestRepository.findByUserId(userId);
+            Guest guest = guestRepository.findByUserId(userId);
+            if (guest == null) {
+                // If guest profile is missing, try to create one from user data if it's a valid
+                // user
+                System.out.println("🔍 Guest profile missing for user: " + userId + ". Attempting auto-creation...");
+                User user = userRepository.findById(userId);
+
+                if (user != null) {
+                    guest = new Guest();
+                    guest.setUserId(userId);
+                    guest.setName(user.getUsername());
+                    guest.setEmail(user.getEmail());
+                    guest.setGuestId(com.oceanview.db.DatabaseHelper.generateId("guests", "guest_id", "guest"));
+                    guestRepository.save(guest);
+                    System.out.println("✅ Auto-created missing guest profile for user: " + user.getUsername());
+                }
+            }
+            return guest;
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }
