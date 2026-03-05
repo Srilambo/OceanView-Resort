@@ -14,14 +14,16 @@ public class Guest implements Serializable {
     private String idType;
     private String idNumber;
     private String nationality;
+    private String userId;
     private LocalDateTime createdAt;
 
     public Guest() {
     }
 
-    public Guest(String guestId, String name, String email, String contactNumber,
+    public Guest(String guestId, String userId, String name, String email, String contactNumber,
             String address, String idType, String idNumber, String nationality) {
         this.guestId = guestId;
+        this.userId = userId;
         this.name = name;
         this.email = email;
         this.contactNumber = contactNumber;
@@ -98,6 +100,14 @@ public class Guest implements Serializable {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

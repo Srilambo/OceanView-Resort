@@ -112,6 +112,9 @@ class HeaderWidget extends StatelessWidget {
             // Navigation
             Row(
               children: [
+                _buildNavItem('HOME', () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }),
                 _buildNavItem(
                     'ROOMS', () => _navigateTo(context, const RoomsScreen())),
                 _buildNavItem('AMENITIES',

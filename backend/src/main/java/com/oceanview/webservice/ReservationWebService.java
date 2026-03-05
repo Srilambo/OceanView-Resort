@@ -23,35 +23,18 @@ public class ReservationWebService {
                 .create();
     }
 
-    @SuppressWarnings("unchecked")
     public String createReservation(String jsonBody) {
         try {
-            Map<String, Object> data = gson.fromJson(jsonBody, Map.class);
-            Reservation reservation = new Reservation();
+            Reservation reservation = gson.fromJson(jsonBody, Reservation.class);
 
-            if (data.containsKey("guest")) {
-                Map<String, Object> guestData = (Map<String, Object>) data.get("guest");
-                Guest guest = new Guest();
-                guest.setGuestId((String) guestData.get("guestId"));
-                reservation.setGuest(guest);
-            }
-
-            if (data.containsKey("room")) {
-                Map<String, Object> roomData = (Map<String, Object>) data.get("room");
-                Room room = new Room();
-                room.setRoomId((String) roomData.get("roomId"));
-                reservation.setRoom(room);
-            }
-
-            reservation.setCheckInDate(LocalDate.parse((String) data.get("checkInDate")));
-            reservation.setCheckOutDate(LocalDate.parse((String) data.get("checkOutDate")));
-            if (data.containsKey("specialRequests")) {
-                reservation.setSpecialRequests((String) data.get("specialRequests"));
-            }
+            // Ensure child objects are at least partially present if IDs were provided
+            // Reservation.class deserialization will handle it if the JSON structure
+            // matched
 
             Reservation created = reservationService.createReservation(reservation);
             return buildJsonResponse(201, gson.toJson(created));
         } catch (Exception e) {
+            e.printStackTrace(); // Log for easier debugging
             return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
@@ -100,11 +83,10 @@ public class ReservationWebService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public String updateReservation(String id, String jsonBody) {
         try {
-            Map<String, String> data = gson.fromJson(jsonBody, Map.class);
-            String status = data.get("status");
+            Map data = gson.fromJson(jsonBody, Map.class);
+            String status = (String) data.get("status");
             Reservation updated = reservationService.updateReservation(id, status);
             return buildJsonResponse(200, gson.toJson(updated));
         } catch (Exception e) {

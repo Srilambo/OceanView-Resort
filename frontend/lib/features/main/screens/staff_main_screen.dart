@@ -195,24 +195,7 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Daily Operations',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF0D47A1),
-                  ),
-                ),
-                IconButton(
-                  onPressed: _loadData,
-                  icon: const Icon(Icons.refresh, color: Color(0xFF1565C0)),
-                  tooltip: 'Refresh Data',
-                ),
-              ],
-            ),
+            _buildStaffHeader(),
             const SizedBox(height: 24),
 
             // Summary Stats
@@ -402,6 +385,82 @@ class _StaffMainScreenState extends State<StaffMainScreen> {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaffHeader() {
+    return Container(
+      width: double.infinity,
+      height: 180,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/hero_beach_landing.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            colors: [
+              const Color(0xFF1565C0).withOpacity(0.9),
+              const Color(0xFF1565C0).withOpacity(0.3),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Ops Terminal',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Daily operations and task management',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FloatingActionButton.small(
+                    onPressed: _loadData,
+                    backgroundColor: Colors.white,
+                    child: const Icon(Icons.refresh, color: Color(0xFF1565C0)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Refresh',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

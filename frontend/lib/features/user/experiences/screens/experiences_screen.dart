@@ -20,7 +20,7 @@ class ExperiencesScreen extends StatelessWidget {
                 colors: [
                   AppColors.darkBg,
                   AppColors.darkBgSecondary,
-                  AppColors.darkBgTertiary,
+                  AppColors.darkBgSecondary,
                 ],
               ),
             ),

@@ -189,13 +189,26 @@ class _RoomStatusViewState extends State<RoomStatusView> {
     );
   }
 
+  String _getRoomImage(String type) {
+    final t = type.trim().toUpperCase();
+    if (t.contains('DELUXE')) {
+      return 'assets/images/room2_garden_deluxe_img2.png';
+    } else if (t.contains('SUITE')) {
+      return 'assets/images/room1_ocean_suite_img2.png';
+    } else if (t.contains('VILLA')) {
+      return 'assets/images/room3_presidential_suite_img1.png';
+    } else {
+      return 'assets/images/luxury_room.png';
+    }
+  }
+
   Widget _buildRoomGrid(List<Room> rooms) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 350,
-        childAspectRatio: 1.1,
+        maxCrossAxisExtent: 400,
+        childAspectRatio: 0.9,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
       ),
@@ -233,53 +246,85 @@ class _RoomStatusViewState extends State<RoomStatusView> {
     }
 
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Room Image Header
           Container(
-            padding: const EdgeInsets.all(16),
+            height: 140,
+            width: double.infinity,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
+              image: DecorationImage(
+                image: AssetImage(_getRoomImage(room.roomType)),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Room ${room.roomNumber}',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0D47A1),
-                      ),
-                    ),
-                    Text(
-                      room.roomType,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.1),
+                    Colors.black.withOpacity(0.5),
                   ],
                 ),
-                Icon(statusIcon, color: statusColor, size: 28),
-              ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Room ${room.roomNumber}',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                                color: statusColor.withOpacity(0.4),
+                                blurRadius: 8)
+                          ],
+                        ),
+                        child: Icon(statusIcon, color: Colors.white, size: 20),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    room.roomType.toUpperCase(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.9),
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(

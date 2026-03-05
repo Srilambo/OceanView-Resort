@@ -5,7 +5,6 @@ import com.oceanview.model.Guest;
 import com.oceanview.model.Room;
 import com.oceanview.repository.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -47,8 +46,8 @@ public class ReservationService {
             }
             reservation.setRoom(room);
 
-            if (reservation.getCheckInDate().isBefore(LocalDate.now())) {
-                throw new Exception("Check-in date cannot be in the past");
+            if (reservation.getCheckInDate().isBefore(LocalDateTime.now().minusMinutes(30))) {
+                throw new Exception("Check-in date cannot be significantly in the past");
             }
 
             if (reservation.getCheckOutDate().isBefore(reservation.getCheckInDate())) {
@@ -65,8 +64,11 @@ public class ReservationService {
             }
 
             long nights = ChronoUnit.DAYS.between(
-                    reservation.getCheckInDate(),
-                    reservation.getCheckOutDate());
+                    reservation.getCheckInDate().toLocalDate(),
+                    reservation.getCheckOutDate().toLocalDate());
+
+            if (nights <= 0)
+                nights = 1; // Minimum 1 night charge
 
             reservation.setNumberOfNights((int) nights);
             reservation.setTotalCost(room.getPricePerNight().multiply(BigDecimal.valueOf(nights)));

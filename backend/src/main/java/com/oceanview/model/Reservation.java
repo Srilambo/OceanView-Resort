@@ -2,7 +2,6 @@ package com.oceanview.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Reservation implements Serializable {
@@ -12,14 +11,16 @@ public class Reservation implements Serializable {
     private String reservationNumber;
     private Guest guest;
     private Room room;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+    private LocalDateTime checkInDate;
+    private LocalDateTime checkOutDate;
     private LocalDateTime actualCheckIn;
     private LocalDateTime actualCheckOut;
     private int numberOfNights;
     private BigDecimal totalCost;
     private String status;
     private String specialRequests;
+    private String paymentMethod;
+    private String paymentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -27,7 +28,7 @@ public class Reservation implements Serializable {
     }
 
     public Reservation(String reservationId, String reservationNumber, Guest guest,
-            Room room, LocalDate checkInDate, LocalDate checkOutDate) {
+            Room room, LocalDateTime checkInDate, LocalDateTime checkOutDate) {
         this.reservationId = reservationId;
         this.reservationNumber = reservationNumber;
         this.guest = guest;
@@ -71,19 +72,19 @@ public class Reservation implements Serializable {
         this.room = room;
     }
 
-    public LocalDate getCheckInDate() {
+    public LocalDateTime getCheckInDate() {
         return checkInDate;
     }
 
-    public void setCheckInDate(LocalDate checkInDate) {
+    public void setCheckInDate(LocalDateTime checkInDate) {
         this.checkInDate = checkInDate;
     }
 
-    public LocalDate getCheckOutDate() {
+    public LocalDateTime getCheckOutDate() {
         return checkOutDate;
     }
 
-    public void setCheckOutDate(LocalDate checkOutDate) {
+    public void setCheckOutDate(LocalDateTime checkOutDate) {
         this.checkOutDate = checkOutDate;
     }
 
@@ -151,9 +152,27 @@ public class Reservation implements Serializable {
         this.actualCheckOut = actualCheckOut;
     }
 
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     @Override
     public String toString() {
         return "Reservation{" + "reservationNumber='" + reservationNumber + '\'' +
-                ", status='" + status + '\'' + ", totalCost=" + totalCost + '}';
+                ", status='" + status + '\'' + ", totalCost=" + totalCost +
+                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentStatus='" + paymentStatus + '\'' + '}';
     }
 }

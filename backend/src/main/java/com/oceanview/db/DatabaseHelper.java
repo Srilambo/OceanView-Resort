@@ -90,4 +90,22 @@ public class DatabaseHelper {
             System.err.println("❌ Connection test failed: " + e.getMessage());
         }
     }
+
+    public static String generateId(String table, String idColumn, String prefix) throws SQLException {
+        String sql = "SELECT " + idColumn + " FROM " + table + " WHERE " + idColumn + " LIKE '" + prefix
+                + "-%' ORDER BY LENGTH(" + idColumn + ") DESC, " + idColumn + " DESC LIMIT 1";
+        try (Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                String maxId = rs.getString(idColumn);
+                try {
+                    int num = Integer.parseInt(maxId.substring(prefix.length() + 1));
+                    return prefix + "-" + String.format("%03d", num + 1);
+                } catch (Exception e) {
+                }
+            }
+        }
+        return prefix + "-001";
+    }
 }

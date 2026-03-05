@@ -117,6 +117,56 @@ class _TasksViewState extends State<TasksView> {
     );
   }
 
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      height: 180,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/staff_task_banner.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              const Color(0xFF0D47A1).withOpacity(0.9),
+              const Color(0xFF0D47A1).withOpacity(0.3),
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              widget.staffId != null ? 'My Daily Tasks' : 'Global Operations',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Manage and track resort activities in real-time',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -124,15 +174,17 @@ class _TasksViewState extends State<TasksView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildHeader(),
+          const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                widget.staffId != null ? 'My Tasks' : 'All Tasks',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 32,
+                'Task Queue',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0D47A1),
+                  color: const Color(0xFF1A1A2E),
                 ),
               ),
               IconButton(
@@ -140,7 +192,7 @@ class _TasksViewState extends State<TasksView> {
                   icon: const Icon(Icons.refresh, color: Color(0xFF1565C0))),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Expanded(
             child: FutureBuilder<List<StaffTask>>(
               future: _tasksFuture,

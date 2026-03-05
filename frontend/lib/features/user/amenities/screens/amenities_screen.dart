@@ -20,7 +20,7 @@ class AmenitiesScreen extends StatelessWidget {
                 colors: [
                   AppColors.darkBg,
                   AppColors.darkBgSecondary,
-                  AppColors.darkBgTertiary,
+                  AppColors.darkBgSecondary,
                 ],
               ),
             ),
@@ -130,6 +130,7 @@ class _AmenitiesHero extends StatelessWidget {
         image: DecorationImage(
           image: const AssetImage('assets/images/luxury_pool.png'),
           fit: BoxFit.cover,
+          onError: (exception, stackTrace) {},
           colorFilter: ColorFilter.mode(
             Colors.black.withOpacity(0.4),
             BlendMode.darken,
@@ -235,6 +236,18 @@ class _AmenityCard extends StatelessWidget {
                 imagePath,
                 fit: BoxFit.cover,
                 width: double.infinity,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: AppColors.darkBgSecondary,
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        size: 40,
+                        color: AppColors.goldAccent.withOpacity(0.2),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -274,4 +287,3 @@ class _AmenityCard extends StatelessWidget {
     );
   }
 }
-

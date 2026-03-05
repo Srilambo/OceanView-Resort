@@ -20,7 +20,7 @@ class AccommodationScreen extends StatelessWidget {
                 colors: [
                   AppColors.darkBg,
                   AppColors.darkBgSecondary,
-                  AppColors.darkBgTertiary,
+                  AppColors.darkBgSecondary,
                 ],
               ),
             ),

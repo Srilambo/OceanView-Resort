@@ -6,7 +6,7 @@ import com.oceanview.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,8 @@ public class ReservationServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         String randomId = java.util.UUID.randomUUID().toString().substring(0, 8);
-        testGuest = new Guest("G-" + randomId, "John Doe", "john" + randomId + "@test.com", "1234567890", "123 Street",
+        testGuest = new Guest("G-" + randomId, "user-" + randomId, "John Doe", "john" + randomId + "@test.com",
+                "1234567890", "123 Street",
                 "Passport", "ABC123", "USA");
         testRoom = new Room("R-" + randomId, "RM-" + randomId, "Double", 2, BigDecimal.valueOf(150), "Ocean view",
                 null, true, "AVAILABLE");
@@ -37,8 +38,8 @@ public class ReservationServiceTest {
         Reservation res = new Reservation();
         res.setGuest(testGuest);
         res.setRoom(testRoom);
-        res.setCheckInDate(LocalDate.now().plusDays(1));
-        res.setCheckOutDate(LocalDate.now().plusDays(3));
+        res.setCheckInDate(LocalDateTime.now().plusDays(1).withHour(14).withMinute(0));
+        res.setCheckOutDate(LocalDateTime.now().plusDays(3).withHour(11).withMinute(0));
 
         Reservation result = service.createReservation(res);
         assertNotNull(result);
@@ -50,8 +51,8 @@ public class ReservationServiceTest {
         Reservation res = new Reservation();
         res.setGuest(testGuest);
         res.setRoom(testRoom);
-        res.setCheckInDate(LocalDate.now().minusDays(1));
-        res.setCheckOutDate(LocalDate.now().plusDays(1));
+        res.setCheckInDate(LocalDateTime.now().minusDays(1));
+        res.setCheckOutDate(LocalDateTime.now().plusDays(1));
 
         assertThrows(Exception.class, () -> {
             service.createReservation(res);
@@ -63,8 +64,8 @@ public class ReservationServiceTest {
         Reservation res = new Reservation();
         res.setGuest(testGuest);
         res.setRoom(testRoom);
-        res.setCheckInDate(LocalDate.now().plusDays(5));
-        res.setCheckOutDate(LocalDate.now().plusDays(2));
+        res.setCheckInDate(LocalDateTime.now().plusDays(5));
+        res.setCheckOutDate(LocalDateTime.now().plusDays(2));
 
         assertThrows(Exception.class, () -> {
             service.createReservation(res);

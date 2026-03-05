@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../theme/app_colors.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/hero_section_widget.dart';
-import '../widgets/booking_card_widget.dart';
+
 import '../widgets/features_widget.dart';
 import '../widgets/room_types_widget.dart';
 import '../widgets/amenities_grid_widget.dart';
@@ -98,7 +98,6 @@ class _LandingScreenState extends State<LandingScreen>
                   fadeAnimation: _fadeController,
                   scrollProgress: _scrollProgress,
                 ),
-                const BookingCardWidget(),
                 const FeaturesWidget(),
                 const RoomTypesWidget(),
                 const AmenitiesGridWidget(),

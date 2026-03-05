@@ -7,6 +7,7 @@ class Guest {
   final String idType;
   final String idNumber;
   final String nationality;
+  final String userId;
 
   Guest({
     required this.guestId,
@@ -17,6 +18,7 @@ class Guest {
     required this.idType,
     required this.idNumber,
     required this.nationality,
+    required this.userId,
   });
 
   factory Guest.fromJson(Map<String, dynamic> json) {
@@ -27,8 +29,9 @@ class Guest {
       contactNumber: json['contactNumber'] ?? '',
       address: json['address'] ?? '',
       idType: json['idType'] ?? '',
-      idNumber: json['idNumber'] ?? '',
+      idNumber: json['idNumber'] ?? json['id_number'] ?? '',
       nationality: json['nationality'] ?? '',
+      userId: json['userId'] ?? json['user_id'] ?? '',
     );
   }
 
@@ -42,6 +45,7 @@ class Guest {
       'idType': idType,
       'idNumber': idNumber,
       'nationality': nationality,
+      'userId': userId,
     };
   }
 }

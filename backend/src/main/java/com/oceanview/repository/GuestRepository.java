@@ -8,21 +8,22 @@ import java.util.*;
 public class GuestRepository {
 
     public Guest save(Guest guest) throws SQLException {
-        String sql = "INSERT INTO guests (guest_id, name, email, contact_number, address, id_type, id_number, nationality) "
+        String sql = "INSERT INTO guests (guest_id, user_id, name, email, contact_number, address, id_type, id_number, nationality) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, guest.getGuestId());
-            pstmt.setString(2, guest.getName());
-            pstmt.setString(3, guest.getEmail());
-            pstmt.setString(4, guest.getContactNumber());
-            pstmt.setString(5, guest.getAddress());
-            pstmt.setString(6, guest.getIdType());
-            pstmt.setString(7, guest.getIdNumber());
-            pstmt.setString(8, guest.getNationality());
+            pstmt.setString(2, guest.getUserId());
+            pstmt.setString(3, guest.getName());
+            pstmt.setString(4, guest.getEmail());
+            pstmt.setString(5, guest.getContactNumber());
+            pstmt.setString(6, guest.getAddress());
+            pstmt.setString(7, guest.getIdType());
+            pstmt.setString(8, guest.getIdNumber());
+            pstmt.setString(9, guest.getNationality());
 
             pstmt.executeUpdate();
             System.out.println("✅ Guest saved: " + guest.getGuestId());
@@ -62,6 +63,22 @@ public class GuestRepository {
         return null;
     }
 
+    public Guest findByUserId(String userId) throws SQLException {
+        String sql = "SELECT * FROM guests WHERE user_id = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return mapResultSetToGuest(rs);
+            }
+        }
+        return null;
+    }
+
     public List<Guest> findAll() throws SQLException {
         String sql = "SELECT * FROM guests";
         List<Guest> guests = new ArrayList<>();
@@ -79,7 +96,7 @@ public class GuestRepository {
 
     public Guest update(Guest guest) throws SQLException {
         String sql = "UPDATE guests SET name = ?, email = ?, contact_number = ?, " +
-                "address = ?, id_type = ?, id_number = ?, nationality = ? WHERE guest_id = ?";
+                "address = ?, id_type = ?, id_number = ?, nationality = ?, user_id = ? WHERE guest_id = ?";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -91,7 +108,8 @@ public class GuestRepository {
             pstmt.setString(5, guest.getIdType());
             pstmt.setString(6, guest.getIdNumber());
             pstmt.setString(7, guest.getNationality());
-            pstmt.setString(8, guest.getGuestId());
+            pstmt.setString(8, guest.getUserId());
+            pstmt.setString(9, guest.getGuestId());
 
             pstmt.executeUpdate();
             System.out.println("✅ Guest updated: " + guest.getGuestId());
@@ -114,6 +132,7 @@ public class GuestRepository {
     private Guest mapResultSetToGuest(ResultSet rs) throws SQLException {
         Guest guest = new Guest();
         guest.setGuestId(rs.getString("guest_id"));
+        guest.setUserId(rs.getString("user_id"));
         guest.setName(rs.getString("name"));
         guest.setEmail(rs.getString("email"));
         guest.setContactNumber(rs.getString("contact_number"));
