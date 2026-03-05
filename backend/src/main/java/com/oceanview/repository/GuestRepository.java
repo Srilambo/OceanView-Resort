@@ -8,8 +8,9 @@ import java.util.*;
 public class GuestRepository {
 
     public Guest save(Guest guest) throws SQLException {
-        String sql = "INSERT INTO guests (guest_id, name, email, contact_number, address, passport_number) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO guests (guest_id, name, email, contact_number, address, id_type, id_number, nationality) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -19,7 +20,9 @@ public class GuestRepository {
             pstmt.setString(3, guest.getEmail());
             pstmt.setString(4, guest.getContactNumber());
             pstmt.setString(5, guest.getAddress());
-            pstmt.setString(6, guest.getPassportNumber());
+            pstmt.setString(6, guest.getIdType());
+            pstmt.setString(7, guest.getIdNumber());
+            pstmt.setString(8, guest.getNationality());
 
             pstmt.executeUpdate();
             System.out.println("✅ Guest saved: " + guest.getGuestId());
@@ -76,7 +79,7 @@ public class GuestRepository {
 
     public Guest update(Guest guest) throws SQLException {
         String sql = "UPDATE guests SET name = ?, email = ?, contact_number = ?, " +
-                "address = ?, passport_number = ? WHERE guest_id = ?";
+                "address = ?, id_type = ?, id_number = ?, nationality = ? WHERE guest_id = ?";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -85,8 +88,10 @@ public class GuestRepository {
             pstmt.setString(2, guest.getEmail());
             pstmt.setString(3, guest.getContactNumber());
             pstmt.setString(4, guest.getAddress());
-            pstmt.setString(5, guest.getPassportNumber());
-            pstmt.setString(6, guest.getGuestId());
+            pstmt.setString(5, guest.getIdType());
+            pstmt.setString(6, guest.getIdNumber());
+            pstmt.setString(7, guest.getNationality());
+            pstmt.setString(8, guest.getGuestId());
 
             pstmt.executeUpdate();
             System.out.println("✅ Guest updated: " + guest.getGuestId());
@@ -107,12 +112,15 @@ public class GuestRepository {
     }
 
     private Guest mapResultSetToGuest(ResultSet rs) throws SQLException {
-        return new Guest(
-                rs.getString("guest_id"),
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("contact_number"),
-                rs.getString("address"),
-                rs.getString("passport_number"));
+        Guest guest = new Guest();
+        guest.setGuestId(rs.getString("guest_id"));
+        guest.setName(rs.getString("name"));
+        guest.setEmail(rs.getString("email"));
+        guest.setContactNumber(rs.getString("contact_number"));
+        guest.setAddress(rs.getString("address"));
+        guest.setIdType(rs.getString("id_type"));
+        guest.setIdNumber(rs.getString("id_number"));
+        guest.setNationality(rs.getString("nationality"));
+        return guest;
     }
 }

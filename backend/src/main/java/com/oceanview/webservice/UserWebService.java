@@ -42,12 +42,15 @@ public class UserWebService {
                     "Access-Control-Allow-Origin: *\r\n" +
                     "\r\n" + gson.toJson(response);
         } catch (Exception e) {
+            String errBody = "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+            byte[] errBytes = errBody.getBytes(java.nio.charset.StandardCharsets.UTF_8);
             return "HTTP/1.1 401 Unauthorized\r\n" +
-                    "Content-Type: application/json\r\n" +
+                    "Content-Type: application/json; charset=UTF-8\r\n" +
                     "Access-Control-Allow-Origin: *\r\n" +
                     "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
                     "Access-Control-Allow-Headers: Content-Type\r\n" +
-                    "\r\n{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}";
+                    "Content-Length: " + errBytes.length + "\r\n" +
+                    "\r\n" + errBody;
         }
     }
 
@@ -70,13 +73,29 @@ public class UserWebService {
     }
 
     private String buildJsonResponse(int statusCode, String body) {
-        String statusText = (statusCode == 200) ? "OK" : (statusCode == 400 ? "Bad Request" : "Unauthorized");
+        String statusText;
+        switch (statusCode) {
+            case 200:
+                statusText = "OK";
+                break;
+            case 400:
+                statusText = "Bad Request";
+                break;
+            case 401:
+                statusText = "Unauthorized";
+                break;
+            default:
+                statusText = "Internal Server Error";
+                break;
+        }
+
+        byte[] bodyBytes = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
-                "Content-Type: application/json\r\n" +
+                "Content-Type: application/json; charset=UTF-8\r\n" +
                 "Access-Control-Allow-Origin: *\r\n" +
                 "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
                 "Access-Control-Allow-Headers: Content-Type\r\n" +
-                "Content-Length: " + body.length() + "\r\n" +
+                "Content-Length: " + bodyBytes.length + "\r\n" +
                 "\r\n" + body;
     }
 

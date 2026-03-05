@@ -9,7 +9,7 @@ public class RoomRepository {
 
     public Room save(Room room) throws SQLException {
         String sql = "INSERT INTO rooms (room_id, room_number, room_type, capacity, " +
-                "price_per_night, description, available) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "price_per_night, description, image_url, available, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -20,7 +20,9 @@ public class RoomRepository {
             pstmt.setInt(4, room.getCapacity());
             pstmt.setBigDecimal(5, room.getPricePerNight());
             pstmt.setString(6, room.getDescription());
-            pstmt.setBoolean(7, room.isAvailable());
+            pstmt.setString(7, room.getImageUrl());
+            pstmt.setBoolean(8, room.isAvailable());
+            pstmt.setString(9, room.getStatus());
 
             pstmt.executeUpdate();
             return room;
@@ -110,7 +112,7 @@ public class RoomRepository {
 
     public Room update(Room room) throws SQLException {
         String sql = "UPDATE rooms SET room_number = ?, room_type = ?, capacity = ?, " +
-                "price_per_night = ?, description = ?, available = ? WHERE room_id = ?";
+                "price_per_night = ?, description = ?, image_url = ?, available = ?, status = ? WHERE room_id = ?";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -120,8 +122,10 @@ public class RoomRepository {
             pstmt.setInt(3, room.getCapacity());
             pstmt.setBigDecimal(4, room.getPricePerNight());
             pstmt.setString(5, room.getDescription());
-            pstmt.setBoolean(6, room.isAvailable());
-            pstmt.setString(7, room.getRoomId());
+            pstmt.setString(6, room.getImageUrl());
+            pstmt.setBoolean(7, room.isAvailable());
+            pstmt.setString(8, room.getStatus());
+            pstmt.setString(9, room.getRoomId());
 
             pstmt.executeUpdate();
             return room;
@@ -148,6 +152,8 @@ public class RoomRepository {
                 rs.getInt("capacity"),
                 rs.getBigDecimal("price_per_night"),
                 rs.getString("description"),
-                rs.getBoolean("available"));
+                rs.getString("image_url"),
+                rs.getBoolean("available"),
+                rs.getString("status"));
     }
 }

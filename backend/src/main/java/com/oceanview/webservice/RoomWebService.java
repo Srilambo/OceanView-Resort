@@ -32,6 +32,7 @@ public class RoomWebService {
             }
             return buildJsonResponse(200, gson.toJson(rooms));
         } catch (Exception e) {
+            System.err.println("❌ Failed to fetch rooms: " + e.getMessage());
             return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
@@ -42,6 +43,7 @@ public class RoomWebService {
             Room createdRoom = roomService.createRoom(room);
             return buildJsonResponse(201, gson.toJson(createdRoom));
         } catch (Exception e) {
+            System.err.println("❌ Failed to create room: " + e.getMessage());
             return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
@@ -66,14 +68,32 @@ public class RoomWebService {
     }
 
     private String buildJsonResponse(int statusCode, String body) {
-        String statusText = (statusCode == 200) ? "OK"
-                : (statusCode == 201 ? "Created" : (statusCode == 400 ? "Bad Request" : "Internal Server Error"));
+        String statusText;
+        switch (statusCode) {
+            case 200:
+                statusText = "OK";
+                break;
+            case 201:
+                statusText = "Created";
+                break;
+            case 400:
+                statusText = "Bad Request";
+                break;
+            case 404:
+                statusText = "Not Found";
+                break;
+            default:
+                statusText = "Internal Server Error";
+                break;
+        }
+
+        byte[] bodyBytes = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
-                "Content-Type: application/json\r\n" +
+                "Content-Type: application/json; charset=UTF-8\r\n" +
                 "Access-Control-Allow-Origin: *\r\n" +
                 "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
                 "Access-Control-Allow-Headers: Content-Type\r\n" +
-                "Content-Length: " + body.length() + "\r\n" +
+                "Content-Length: " + bodyBytes.length + "\r\n" +
                 "\r\n" + body;
     }
 }

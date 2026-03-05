@@ -13,6 +13,7 @@ class UserManagementView extends StatefulWidget {
 
 class _UserManagementViewState extends State<UserManagementView> {
   late Future<List<User>> _usersFuture;
+  int _selectedTab = 0; // 0: Guests, 1: Staff & Admins
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _UserManagementViewState extends State<UserManagementView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add New User', style: GoogleFonts.playfairDisplay()),
+        title: Text('Add Staff/Admin', style: GoogleFonts.playfairDisplay()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -70,9 +71,7 @@ class _UserManagementViewState extends State<UserManagementView> {
               value: selectedRole,
               items: const [
                 DropdownMenuItem(value: 'ROLE_ADMIN', child: Text('Admin')),
-                DropdownMenuItem(value: 'ROLE_MANAGER', child: Text('Manager')),
                 DropdownMenuItem(value: 'ROLE_STAFF', child: Text('Staff')),
-                DropdownMenuItem(value: 'ROLE_USER', child: Text('Guest/User')),
               ],
               onChanged: (val) => selectedRole = val!,
               decoration: const InputDecoration(labelText: 'Role'),
@@ -119,7 +118,7 @@ class _UserManagementViewState extends State<UserManagementView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'User Management',
+                'Accounts Management',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -129,7 +128,7 @@ class _UserManagementViewState extends State<UserManagementView> {
               ElevatedButton.icon(
                 onPressed: _showAddUserDialog,
                 icon: const Icon(Icons.add),
-                label: const Text('Add User'),
+                label: const Text('Add Staff/Admin'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1565C0),
                   foregroundColor: Colors.white,
@@ -141,6 +140,21 @@ class _UserManagementViewState extends State<UserManagementView> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          // Tab Switcher
+          Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                _buildTab(0, 'Guests'),
+                _buildTab(1, 'Staff & Admins'),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           Expanded(
@@ -181,7 +195,25 @@ class _UserManagementViewState extends State<UserManagementView> {
                     );
                   }
 
-                  final userList = snapshot.data!;
+                  String targetDisplay = _selectedTab == 0 ? 'Guest' : 'Staff';
+                  bool includeAdmins = _selectedTab == 1;
+
+                  final userList = snapshot.data!
+                      .where((u) =>
+                          u.displayRole == targetDisplay ||
+                          (includeAdmins && u.displayRole == 'Admin'))
+                      .toList();
+
+                  if (userList.isEmpty) {
+                    return Center(
+                      child: Text(
+                          _selectedTab == 0
+                              ? 'No Guest accounts found.'
+                              : 'No Staff or Admin accounts found.',
+                          style: GoogleFonts.montserrat(color: Colors.grey)),
+                    );
+                  }
+
                   return ListView.separated(
                     itemCount: userList.length,
                     separatorBuilder: (context, index) =>
@@ -239,11 +271,9 @@ class _UserManagementViewState extends State<UserManagementView> {
                             ),
                             const SizedBox(width: 16),
                             SizedBox(
-                              width: 80,
+                              width: 100, // Increased width
                               child: Text(
-                                user.roles
-                                    .map((r) => r.replaceAll('ROLE_', ''))
-                                    .join(', '),
+                                user.displayRole,
                                 style: GoogleFonts.montserrat(
                                     color: Colors.grey.shade700,
                                     fontSize: 13,
@@ -271,6 +301,34 @@ class _UserManagementViewState extends State<UserManagementView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTab(int index, String label) {
+    final isSelected = _selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: isSelected
+                ? [BoxShadow(color: Colors.black12, blurRadius: 4)]
+                : null,
+          ),
+          margin: const EdgeInsets.all(4),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected ? const Color(0xFF0D47A1) : Colors.grey,
+            ),
+          ),
+        ),
       ),
     );
   }

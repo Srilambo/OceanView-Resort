@@ -5,6 +5,10 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 import '../models/room.dart';
 import '../models/reservation.dart';
+import '../models/staff.dart';
+import '../models/task.dart';
+import '../models/resort_service.dart';
+import '../models/review.dart';
 
 class ApiService {
   // Adjust this based on where your backend runs.
@@ -44,7 +48,8 @@ class ApiService {
         final List<dynamic> list = jsonDecode(response.body);
         return list.map((item) => Room.fromJson(item)).toList();
       } else {
-        throw Exception('Failed to load rooms');
+        throw Exception(
+            'Server returned ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       throw Exception('Connection error: $e');
@@ -220,7 +225,8 @@ class ApiService {
         final List<dynamic> list = jsonDecode(response.body);
         return list.map((item) => User.fromJson(item)).toList();
       } else {
-        throw Exception('Failed to load users');
+        throw Exception(
+            'Server returned ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       throw Exception('Connection error: $e');
@@ -381,7 +387,9 @@ class ApiService {
   }
 
   static Future<void> updateReservationStatus(
-      String reservationId, String status) async {
+    String reservationId,
+    String status,
+  ) async {
     try {
       final response = await http
           .put(
@@ -393,6 +401,321 @@ class ApiService {
 
       if (response.statusCode != 200) {
         throw Exception('Failed to update reservation status');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // ========== Staff Management ==========
+
+  static Future<List<Staff>> getAllStaff() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/staff'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => Staff.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load staff');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Staff> createStaff(Staff staff) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/staff'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(staff.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 201) {
+        return Staff.fromJson(jsonDecode(response.body));
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['error'] ?? 'Failed to create staff');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Staff> updateStaff(Staff staff) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/staff'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(staff.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return Staff.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to update staff');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> deleteStaff(String staffId) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('$baseUrl/staff/$staffId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete staff');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> getStaffStats() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/staff/stats'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to load staff stats');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<List<Staff>> getStaffByDepartment(String department) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/staff/department/$department'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => Staff.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load staff by department');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // ========== Task Management ==========
+
+  static Future<List<StaffTask>> getAllTasks() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/tasks'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => StaffTask.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load tasks');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<List<StaffTask>> getStaffTasks(String staffId) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/tasks/staff/$staffId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => StaffTask.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load staff tasks');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<StaffTask> createTask(StaffTask task) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/tasks'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(task.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 201) {
+        return StaffTask.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to create task');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<StaffTask> updateTask(StaffTask task) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/tasks'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(task.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return StaffTask.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to update task');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> updateTaskStatus(String taskId, String status) async {
+    try {
+      final response = await http
+          .patch(Uri.parse('$baseUrl/tasks/$taskId/status/$status'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update task status');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> deleteTask(String taskId) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('$baseUrl/tasks/$taskId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete task');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // ========== Resort Services ==========
+
+  static Future<List<ResortService>> getAllServices() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/services'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => ResortService.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load resort services');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<List<ResortService>> getServicesByCategory(
+      String category) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/services/category/$category'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => ResortService.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load resort services by category');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // ========== Reviews ==========
+
+  static Future<List<Review>> getAllReviews() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/reviews'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> list = jsonDecode(response.body);
+        return list.map((item) => Review.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load reviews');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Review> createReview(Review review) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/reviews'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(review.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 201) {
+        return Review.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to create review');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> checkIn(String reservationId) async {
+    try {
+      final response = await http
+          .post(Uri.parse('$baseUrl/reservations/$reservationId/check-in'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to check in');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<void> checkOut(String reservationId) async {
+    try {
+      final response = await http
+          .post(Uri.parse('$baseUrl/reservations/$reservationId/check-out'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to check out');
       }
     } catch (e) {
       throw Exception('Connection error: $e');

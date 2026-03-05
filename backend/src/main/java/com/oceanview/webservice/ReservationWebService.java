@@ -121,17 +121,51 @@ public class ReservationWebService {
         }
     }
 
+    public String checkIn(String id) {
+        try {
+            reservationService.checkIn(id);
+            return buildJsonResponse(200, "{\"message\": \"Checked in successfully\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String checkOut(String id) {
+        try {
+            reservationService.checkOut(id);
+            return buildJsonResponse(200, "{\"message\": \"Checked out successfully\"}");
+        } catch (Exception e) {
+            return buildJsonResponse(400, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
     private String buildJsonResponse(int statusCode, String body) {
-        String statusText = (statusCode == 200) ? "OK"
-                : (statusCode == 201 ? "Created"
-                        : (statusCode == 404 ? "Not Found"
-                                : (statusCode == 400 ? "Bad Request" : "Internal Server Error")));
+        String statusText;
+        switch (statusCode) {
+            case 200:
+                statusText = "OK";
+                break;
+            case 201:
+                statusText = "Created";
+                break;
+            case 404:
+                statusText = "Not Found";
+                break;
+            case 400:
+                statusText = "Bad Request";
+                break;
+            default:
+                statusText = "Internal Server Error";
+                break;
+        }
+
+        byte[] bodyBytes = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
-                "Content-Type: application/json\r\n" +
+                "Content-Type: application/json; charset=UTF-8\r\n" +
                 "Access-Control-Allow-Origin: *\r\n" +
                 "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n" +
                 "Access-Control-Allow-Headers: Content-Type\r\n" +
-                "Content-Length: " + body.length() + "\r\n" +
+                "Content-Length: " + bodyBytes.length + "\r\n" +
                 "\r\n" + body;
     }
 }

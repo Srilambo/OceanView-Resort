@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/navigation/sidebar_navigation.dart';
 import '../../../shared/navigation/top_navigation.dart';
+import 'guest_views/browse_rooms_view.dart';
+import 'guest_views/my_bookings_view.dart';
+import 'guest_views/services_view.dart';
+import 'guest_views/reviews_view.dart';
+import 'guest_views/my_profile_view.dart';
 
 class GuestMainScreen extends StatefulWidget {
   const GuestMainScreen({Key? key}) : super(key: key);
@@ -12,7 +17,7 @@ class GuestMainScreen extends StatefulWidget {
 
 class _GuestMainScreenState extends State<GuestMainScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final String _currentRoute = '/guest/home';
+  String _currentRoute = '/guest/home';
 
   final List<NavigationItem> guestNavItems = [
     NavigationItem(
@@ -61,6 +66,12 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
         child: SidebarNavigation(
           currentRoute: _currentRoute,
           items: guestNavItems,
+          onRouteSelect: (route) {
+            setState(() => _currentRoute = route);
+            if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+              Navigator.pop(context);
+            }
+          },
         ),
       ),
       body: Row(
@@ -70,137 +81,169 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
             SidebarNavigation(
               currentRoute: _currentRoute,
               items: guestNavItems,
+              onRouteSelect: (route) {
+                setState(() => _currentRoute = route);
+              },
             ),
 
           // Main Content
           Expanded(
             child: Container(
               color: Colors.grey.shade50,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Welcome Section
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF1565C0),
-                            Color(0xFF0D47A1),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Welcome Back!',
-                                  style: GoogleFonts.playfairDisplay(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Discover amazing experiences at Ocean View Resort',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 14,
-                                    color: Colors.white.withOpacity(0.9),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.waves,
-                              size: 48,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    // Quick Actions
-                    Text(
-                      'Quick Actions',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0D47A1),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    GridView.count(
-                      crossAxisCount:
-                          MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 1.2,
-                      children: [
-                        _buildActionCard(
-                          icon: Icons.add_home,
-                          title: 'New Booking',
-                          subtitle: 'Reserve a room',
-                          color: const Color(0xFF1565C0),
-                          onTap: () {},
-                        ),
-                        _buildActionCard(
-                          icon: Icons.event_note,
-                          title: 'My Bookings',
-                          subtitle: 'View reservations',
-                          color: const Color(0xFFF57C00),
-                          onTap: () {},
-                        ),
-                        _buildActionCard(
-                          icon: Icons.receipt,
-                          title: 'Bills',
-                          subtitle: 'Download invoices',
-                          color: const Color(0xFF009688),
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    // Upcoming Bookings
-                    Text(
-                      'Upcoming Bookings',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0D47A1),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    _buildBookingCard(),
-                    const SizedBox(height: 16),
-                    _buildBookingCard(),
-                  ],
-                ),
-              ),
+              child: _buildBodyContent(),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBodyContent() {
+    switch (_currentRoute) {
+      case '/guest/home':
+        return _buildDashboardContent();
+      case '/guest/rooms':
+        return const BrowseRoomsView();
+      case '/guest/bookings':
+        return const MyBookingsView();
+      case '/guest/services':
+        return const ServicesView();
+      case '/guest/reviews':
+        return const ReviewsView();
+      case '/guest/profile':
+        return const MyProfileView();
+      default:
+        return _buildDashboardContent();
+    }
+  }
+
+  Widget _buildDashboardContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome Section
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF1565C0),
+                  Color(0xFF0D47A1),
+                ],
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome Back!',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Discover amazing experiences at Ocean View Resort',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.waves,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          // Quick Actions
+          Text(
+            'Quick Actions',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF0D47A1),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          GridView.count(
+            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio:
+                MediaQuery.of(context).size.width > 600 ? 1.5 : 1.1,
+            children: [
+              _buildActionCard(
+                icon: Icons.add_home,
+                title: 'New Booking',
+                subtitle: 'Reserve a room',
+                color: const Color(0xFF1565C0),
+                onTap: () {
+                  setState(() => _currentRoute = '/guest/rooms');
+                },
+              ),
+              _buildActionCard(
+                icon: Icons.event_note,
+                title: 'My Bookings',
+                subtitle: 'View reservations',
+                color: const Color(0xFFF57C00),
+                onTap: () {
+                  setState(() => _currentRoute = '/guest/bookings');
+                },
+              ),
+              _buildActionCard(
+                icon: Icons.receipt,
+                title: 'Bills',
+                subtitle: 'Download invoices',
+                color: const Color(0xFF009688),
+                onTap: () {
+                  setState(() => _currentRoute = '/guest/bookings');
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 30),
+
+          // Upcoming Bookings
+          Text(
+            'Upcoming Bookings',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF0D47A1),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          _buildBookingCard(),
+          const SizedBox(height: 16),
+          _buildBookingCard(),
         ],
       ),
     );

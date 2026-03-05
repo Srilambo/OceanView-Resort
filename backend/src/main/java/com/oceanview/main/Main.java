@@ -9,6 +9,7 @@ public class Main {
 
         // Test Database Connection
         DatabaseHelper.testConnection();
+        DatabaseHelper.runSqlScript("resources/update_db.sql");
 
         // Start HTTP Server
         HttpServer server = new HttpServer(8080);

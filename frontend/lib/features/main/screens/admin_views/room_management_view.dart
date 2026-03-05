@@ -5,7 +5,7 @@ import '../../../../models/room.dart';
 import '../../../../services/api_service.dart';
 
 class RoomManagementView extends StatefulWidget {
-  const RoomManagementView({Key? key}) : super(key: key);
+  const RoomManagementView({super.key});
 
   @override
   State<RoomManagementView> createState() => _RoomManagementViewState();
@@ -29,11 +29,13 @@ class _RoomManagementViewState extends State<RoomManagementView> {
   Future<void> _deleteRoom(String roomId) async {
     try {
       await ApiService.deleteRoom(roomId);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Room deleted successfully')),
       );
       _refresh();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting room: $e')),
       );
@@ -46,6 +48,7 @@ class _RoomManagementViewState extends State<RoomManagementView> {
     final capacityController = TextEditingController();
     final priceController = TextEditingController();
     final descController = TextEditingController();
+    final imageController = TextEditingController();
 
     showDialog(
       context: context,
@@ -75,6 +78,12 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                 keyboardType: TextInputType.number,
               ),
               TextField(
+                controller: imageController,
+                decoration: const InputDecoration(
+                    labelText: 'Image URL',
+                    hintText: 'https://images.unsplash.com/...'),
+              ),
+              TextField(
                 controller: descController,
                 decoration: const InputDecoration(labelText: 'Description'),
                 maxLines: 3,
@@ -97,12 +106,18 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                   capacity: int.parse(capacityController.text),
                   pricePerNight: double.parse(priceController.text),
                   description: descController.text,
+                  imageUrl: imageController.text.isNotEmpty
+                      ? imageController.text
+                      : null,
                   available: true,
+                  status: 'AVAILABLE',
                 );
                 await ApiService.createRoom(room);
+                if (!mounted) return;
                 Navigator.pop(context);
                 _refresh();
               } catch (e) {
+                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error: $e')),
                 );
@@ -158,7 +173,8 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                 border: Border.all(color: Colors.grey.shade200),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8),
                 ],
               ),
               child: FutureBuilder<List<Room>>(
@@ -198,14 +214,26 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
-                        leading: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF009688).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            color:
+                                const Color(0xFF009688).withValues(alpha: 0.1),
+                            child: room.imageUrl != null &&
+                                    room.imageUrl!.isNotEmpty
+                                ? Image.network(
+                                    room.imageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.hotel,
+                                                color: Color(0xFF009688)),
+                                  )
+                                : const Icon(Icons.hotel,
+                                    color: Color(0xFF009688)),
                           ),
-                          child:
-                              const Icon(Icons.hotel, color: Color(0xFF009688)),
                         ),
                         title: Text(
                           room.roomType,
@@ -214,7 +242,7 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                               color: const Color(0xFF0D47A1)),
                         ),
                         subtitle: Text(
-                          'Room Number: ${room.roomNumber}',
+                          'Room ${room.roomNumber} • Max ${room.capacity} Guests',
                           style: GoogleFonts.montserrat(
                               color: Colors.grey.shade600, fontSize: 13),
                         ),
@@ -235,8 +263,8 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                                   horizontal: 12, vertical: 4),
                               decoration: BoxDecoration(
                                 color: room.available
-                                    ? Colors.green.withOpacity(0.1)
-                                    : Colors.orange.withOpacity(0.1),
+                                    ? Colors.green.withValues(alpha: 0.1)
+                                    : Colors.orange.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(

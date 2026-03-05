@@ -164,4 +164,20 @@ public class ReservationService {
             throw new Exception("Database error: " + e.getMessage());
         }
     }
+
+    public void checkIn(String id) throws Exception {
+        try {
+            reservationRepository.updateCheckIn(id, LocalDateTime.now());
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
+
+    public void checkOut(String id) throws Exception {
+        try {
+            reservationRepository.updateCheckOut(id, LocalDateTime.now());
+        } catch (SQLException e) {
+            throw new Exception("Database error: " + e.getMessage());
+        }
+    }
 }

@@ -7,8 +7,7 @@ import 'admin_views/room_management_view.dart';
 import 'admin_views/booking_management_view.dart';
 import 'admin_views/reports_view.dart';
 import 'admin_views/settings_view.dart';
-import 'admin_views/staff_management_view.dart';
-import 'admin_views/manager_management_view.dart';
+import 'staff_views/tasks_view.dart';
 
 class AdminMainScreen extends StatefulWidget {
   const AdminMainScreen({Key? key}) : super(key: key);
@@ -28,19 +27,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       route: '/admin/home',
     ),
     NavigationItem(
-      label: 'Users',
+      label: 'Accounts',
       icon: Icons.people,
       route: '/admin/users',
-    ),
-    NavigationItem(
-      label: 'Staff',
-      icon: Icons.badge,
-      route: '/admin/staff',
-    ),
-    NavigationItem(
-      label: 'Managers',
-      icon: Icons.manage_accounts,
-      route: '/admin/managers',
     ),
     NavigationItem(
       label: 'Rooms',
@@ -56,6 +45,11 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       label: 'Reports',
       icon: Icons.assessment,
       route: '/admin/reports',
+    ),
+    NavigationItem(
+      label: 'Tasks',
+      icon: Icons.assignment,
+      route: '/admin/tasks',
     ),
     NavigationItem(
       label: 'Settings',
@@ -113,16 +107,14 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         return _buildDashboard();
       case '/admin/users':
         return const UserManagementView();
-      case '/admin/staff':
-        return const StaffManagementView();
-      case '/admin/managers':
-        return const ManagerManagementView();
       case '/admin/rooms':
         return const RoomManagementView();
       case '/admin/bookings':
         return const BookingManagementView();
       case '/admin/reports':
         return const ReportsView();
+      case '/admin/tasks':
+        return const TasksView();
       case '/admin/settings':
         return const SettingsView();
       default:
@@ -137,7 +129,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'System Control Panel',
+            'Resort Management Center',
             style: GoogleFonts.playfairDisplay(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -183,7 +175,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             children: [
               _buildManagementCard(
                 icon: Icons.person_add,
-                title: 'User Management',
+                title: 'Accounts Management',
                 description: 'Manage users and roles',
                 color: const Color(0xFF1565C0),
                 onTap: () {
