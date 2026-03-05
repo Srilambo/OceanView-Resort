@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../../auth/screens/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -157,7 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
-                      // Navigate to signup
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
                     },
                     child: Text(
                       'Don\'t have an account? Sign Up',
@@ -180,8 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   _buildTestAccountInfo('Admin:', 'admin / admin123'),
-                  _buildTestAccountInfo('Staff:', 'staff / staff123'),
-                  _buildTestAccountInfo('Manager:', 'manager / manager123'),
+                  _buildTestAccountInfo('Staff:', 'john.smith / staff123'),
                 ],
               ),
             ),

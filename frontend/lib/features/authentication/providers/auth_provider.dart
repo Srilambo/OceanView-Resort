@@ -17,6 +17,47 @@ class AuthProvider extends ChangeNotifier {
 
   UserRole get userRole => _currentUser?.userRole ?? UserRole.GUEST;
 
+  Future<void> register(String username, String password, String email) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await http
+          .post(
+            Uri.parse('${ApiService.baseUrl}/auth/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'username': username,
+              'password': password,
+              'email': email,
+              'enabled': true,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> userData = jsonDecode(response.body);
+        _currentUser = UserModel.fromJson(userData);
+        _error = null;
+      } else {
+        String msg = 'Registration failed';
+        try {
+          final errorData = jsonDecode(response.body);
+          msg = errorData['error'] ?? msg;
+        } catch (_) {}
+        _error = msg;
+        _currentUser = null;
+      }
+    } catch (e) {
+      _error = "Connection error: $e";
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> login(String username, String password) async {
     _isLoading = true;
     _error = null;
@@ -37,46 +78,19 @@ class AuthProvider extends ChangeNotifier {
         _currentUser = UserModel.fromJson(userData);
         _error = null;
       } else {
-        // Fallback to mock for development ONLY if backend fails
-        // But for this task, the user specifically mentioned backend integration
-        // so we should probably throw an error if backend fails,
-        // but I'll keep a more robust fallback for now.
+        // Clearer error from backend
+        String msg = 'Login failed';
+        try {
+          final errorData = jsonDecode(response.body);
+          msg = errorData['error'] ?? msg;
+        } catch (_) {}
 
-        if (username == 'admin' && password == 'admin123') {
-          _currentUser = UserModel(
-            id: 'admin_1',
-            username: 'admin',
-            fullName: 'System Administrator',
-            email: 'admin@oceanview.com',
-            role: 'ADMIN',
-          );
-        } else if (username == 'manager' && password == 'manager123') {
-          _currentUser = UserModel(
-            id: 'mgr_1',
-            username: 'manager_one',
-            fullName: 'Hotel Manager',
-            email: 'manager@oceanview.com',
-            role: 'MANAGER',
-          );
-        } else {
-          _error = 'Login failed: ${response.statusCode}';
-          _currentUser = null;
-        }
-      }
-    } catch (e) {
-      // If backend is not running, use mock for local dev if it matches test accounts
-      if (username == 'admin' && password == 'admin123') {
-        _currentUser = UserModel(
-          id: 'admin_1',
-          username: 'admin',
-          fullName: 'System Administrator',
-          email: 'admin@oceanview.com',
-          role: 'ADMIN',
-        );
-      } else {
-        _error = "Connection error: $e";
+        _error = msg;
         _currentUser = null;
       }
+    } catch (e) {
+      _error = "Connection error: $e";
+      _currentUser = null;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -106,11 +120,9 @@ class AuthProvider extends ChangeNotifier {
       case 'PERM_MANAGE_USERS':
         return role == UserRole.ADMIN;
       case 'PERM_VIEW_REPORTS':
-        return role == UserRole.ADMIN ||
-            role == UserRole.MANAGER ||
-            role == UserRole.STAFF;
+        return role == UserRole.ADMIN || role == UserRole.STAFF;
       case 'PERM_MANAGE_PRICING':
-        return role == UserRole.ADMIN || role == UserRole.MANAGER;
+        return role == UserRole.ADMIN;
       default:
         return false;
     }

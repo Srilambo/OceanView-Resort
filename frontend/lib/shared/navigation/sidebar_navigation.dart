@@ -282,7 +282,7 @@ class _SidebarNavigationState extends State<SidebarNavigation> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              authProvider.currentUser?.role ?? 'Guest',
+                              authProvider.currentUser?.displayRole ?? 'Guest',
                               style: GoogleFonts.montserrat(
                                 fontSize: 10,
                                 color: Colors.white.withOpacity(0.6),

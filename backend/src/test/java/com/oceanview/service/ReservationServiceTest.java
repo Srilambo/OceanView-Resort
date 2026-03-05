@@ -19,9 +19,9 @@ public class ReservationServiceTest {
     public void setUp() throws Exception {
         String randomId = java.util.UUID.randomUUID().toString().substring(0, 8);
         testGuest = new Guest("G-" + randomId, "John Doe", "john" + randomId + "@test.com", "1234567890", "123 Street",
-                "ABC123");
+                "Passport", "ABC123", "USA");
         testRoom = new Room("R-" + randomId, "RM-" + randomId, "Double", 2, BigDecimal.valueOf(150), "Ocean view",
-                true);
+                null, true, "AVAILABLE");
 
         GuestRepository guestRepo = new GuestRepository();
         guestRepo.save(testGuest);

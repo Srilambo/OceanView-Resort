@@ -15,11 +15,14 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));
+            PrintWriter out = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), java.nio.charset.StandardCharsets.UTF_8)));
 
             String requestLine = in.readLine();
-            if (requestLine == null) return;
+            if (requestLine == null)
+                return;
 
             String[] parts = requestLine.split(" ");
             String method = parts[0];

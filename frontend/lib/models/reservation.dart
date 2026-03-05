@@ -7,10 +7,13 @@ class Reservation {
   final String roomNumber;
   final DateTime checkInDate;
   final DateTime checkOutDate;
+  final DateTime? actualCheckIn;
+  final DateTime? actualCheckOut;
   final int numberOfNights;
   final double totalCost;
   final String status;
   final String? specialRequests;
+  final String roomType;
 
   Reservation({
     required this.reservationId,
@@ -21,10 +24,13 @@ class Reservation {
     required this.roomNumber,
     required this.checkInDate,
     required this.checkOutDate,
+    this.actualCheckIn,
+    this.actualCheckOut,
     required this.numberOfNights,
     required this.totalCost,
     required this.status,
     this.specialRequests,
+    required this.roomType,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
@@ -41,10 +47,17 @@ class Reservation {
       checkOutDate: DateTime.parse(
         json['checkOutDate'] ?? DateTime.now().toString(),
       ),
+      actualCheckIn: json['actualCheckIn'] != null
+          ? DateTime.parse(json['actualCheckIn'])
+          : null,
+      actualCheckOut: json['actualCheckOut'] != null
+          ? DateTime.parse(json['actualCheckOut'])
+          : null,
       numberOfNights: json['numberOfNights'] ?? 0,
       totalCost: (json['totalCost'] as num?)?.toDouble() ?? 0.0,
       status: json['status'] ?? 'PENDING',
       specialRequests: json['specialRequests'],
+      roomType: json['room']?['roomType'] ?? '',
     );
   }
 
@@ -57,11 +70,14 @@ class Reservation {
       'roomId': roomId,
       'roomNumber': roomNumber,
       'checkInDate': checkInDate.toString().split(' ')[0],
-      'checkOutDate': checkOutDate.toString().split(' ')[0],
+      'checkOutDate': checkOutDate.toIso8601String(),
+      'actualCheckIn': actualCheckIn?.toIso8601String(),
+      'actualCheckOut': actualCheckOut?.toIso8601String(),
       'numberOfNights': numberOfNights,
       'totalCost': totalCost,
       'status': status,
       'specialRequests': specialRequests,
+      'roomType': roomType,
     };
   }
 }

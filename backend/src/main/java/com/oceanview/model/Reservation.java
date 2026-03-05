@@ -14,6 +14,8 @@ public class Reservation implements Serializable {
     private Room room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
+    private LocalDateTime actualCheckIn;
+    private LocalDateTime actualCheckOut;
     private int numberOfNights;
     private BigDecimal totalCost;
     private String status;
@@ -21,10 +23,11 @@ public class Reservation implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Reservation() {}
+    public Reservation() {
+    }
 
     public Reservation(String reservationId, String reservationNumber, Guest guest,
-                       Room room, LocalDate checkInDate, LocalDate checkOutDate) {
+            Room room, LocalDate checkInDate, LocalDate checkOutDate) {
         this.reservationId = reservationId;
         this.reservationNumber = reservationNumber;
         this.guest = guest;
@@ -36,45 +39,121 @@ public class Reservation implements Serializable {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public String getReservationId() { return reservationId; }
-    public void setReservationId(String reservationId) { this.reservationId = reservationId; }
+    public String getReservationId() {
+        return reservationId;
+    }
 
-    public String getReservationNumber() { return reservationNumber; }
-    public void setReservationNumber(String reservationNumber) { this.reservationNumber = reservationNumber; }
+    public void setReservationId(String reservationId) {
+        this.reservationId = reservationId;
+    }
 
-    public Guest getGuest() { return guest; }
-    public void setGuest(Guest guest) { this.guest = guest; }
+    public String getReservationNumber() {
+        return reservationNumber;
+    }
 
-    public Room getRoom() { return room; }
-    public void setRoom(Room room) { this.room = room; }
+    public void setReservationNumber(String reservationNumber) {
+        this.reservationNumber = reservationNumber;
+    }
 
-    public LocalDate getCheckInDate() { return checkInDate; }
-    public void setCheckInDate(LocalDate checkInDate) { this.checkInDate = checkInDate; }
+    public Guest getGuest() {
+        return guest;
+    }
 
-    public LocalDate getCheckOutDate() { return checkOutDate; }
-    public void setCheckOutDate(LocalDate checkOutDate) { this.checkOutDate = checkOutDate; }
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
 
-    public int getNumberOfNights() { return numberOfNights; }
-    public void setNumberOfNights(int numberOfNights) { this.numberOfNights = numberOfNights; }
+    public Room getRoom() {
+        return room;
+    }
 
-    public BigDecimal getTotalCost() { return totalCost; }
-    public void setTotalCost(BigDecimal totalCost) { this.totalCost = totalCost; }
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public LocalDate getCheckInDate() {
+        return checkInDate;
+    }
 
-    public String getSpecialRequests() { return specialRequests; }
-    public void setSpecialRequests(String specialRequests) { this.specialRequests = specialRequests; }
+    public void setCheckInDate(LocalDate checkInDate) {
+        this.checkInDate = checkInDate;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDate getCheckOutDate() {
+        return checkOutDate;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setCheckOutDate(LocalDate checkOutDate) {
+        this.checkOutDate = checkOutDate;
+    }
+
+    public int getNumberOfNights() {
+        return numberOfNights;
+    }
+
+    public void setNumberOfNights(int numberOfNights) {
+        this.numberOfNights = numberOfNights;
+    }
+
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSpecialRequests() {
+        return specialRequests;
+    }
+
+    public void setSpecialRequests(String specialRequests) {
+        this.specialRequests = specialRequests;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getActualCheckIn() {
+        return actualCheckIn;
+    }
+
+    public void setActualCheckIn(LocalDateTime actualCheckIn) {
+        this.actualCheckIn = actualCheckIn;
+    }
+
+    public LocalDateTime getActualCheckOut() {
+        return actualCheckOut;
+    }
+
+    public void setActualCheckOut(LocalDateTime actualCheckOut) {
+        this.actualCheckOut = actualCheckOut;
+    }
 
     @Override
     public String toString() {
         return "Reservation{" + "reservationNumber='" + reservationNumber + '\'' +
-               ", status='" + status + '\'' + ", totalCost=" + totalCost + '}';
+                ", status='" + status + '\'' + ", totalCost=" + totalCost + '}';
     }
 }

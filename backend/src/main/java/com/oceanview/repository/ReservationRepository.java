@@ -6,14 +6,16 @@ import com.oceanview.model.Room;
 import com.oceanview.db.DatabaseHelper;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class ReservationRepository {
 
     public Reservation save(Reservation reservation) throws SQLException {
         String sql = "INSERT INTO reservations (reservation_id, reservation_number, guest_id, room_id, " +
-                "check_in_date, check_out_date, number_of_nights, total_cost, status, special_requests) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "check_in_date, check_out_date, actual_check_in, actual_check_out, number_of_nights, total_cost, status, special_requests) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -24,10 +26,15 @@ public class ReservationRepository {
             pstmt.setString(4, reservation.getRoom().getRoomId());
             pstmt.setString(5, reservation.getCheckInDate().toString());
             pstmt.setString(6, reservation.getCheckOutDate().toString());
-            pstmt.setInt(7, reservation.getNumberOfNights());
-            pstmt.setBigDecimal(8, reservation.getTotalCost());
-            pstmt.setString(9, reservation.getStatus());
-            pstmt.setString(10, reservation.getSpecialRequests());
+            pstmt.setTimestamp(7,
+                    reservation.getActualCheckIn() != null ? Timestamp.valueOf(reservation.getActualCheckIn()) : null);
+            pstmt.setTimestamp(8,
+                    reservation.getActualCheckOut() != null ? Timestamp.valueOf(reservation.getActualCheckOut())
+                            : null);
+            pstmt.setInt(9, reservation.getNumberOfNights());
+            pstmt.setBigDecimal(10, reservation.getTotalCost());
+            pstmt.setString(11, reservation.getStatus());
+            pstmt.setString(12, reservation.getSpecialRequests());
 
             pstmt.executeUpdate();
             System.out.println("✅ Reservation saved: " + reservation.getReservationNumber());
@@ -36,7 +43,8 @@ public class ReservationRepository {
     }
 
     public Reservation findById(String reservationId) throws SQLException {
-        String sql = "SELECT r.*, g.name as guest_name, g.email, " +
+        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
+                +
                 "rm.room_number, rm.room_type, rm.price_per_night " +
                 "FROM reservations r " +
                 "JOIN guests g ON r.guest_id = g.guest_id " +
@@ -57,7 +65,8 @@ public class ReservationRepository {
     }
 
     public Reservation findByReservationNumber(String reservationNumber) throws SQLException {
-        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, " +
+        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
+                +
                 "rm.room_number, rm.room_type, rm.price_per_night " +
                 "FROM reservations r " +
                 "JOIN guests g ON r.guest_id = g.guest_id " +
@@ -78,7 +87,8 @@ public class ReservationRepository {
     }
 
     public List<Reservation> findByGuestId(String guestId) throws SQLException {
-        String sql = "SELECT r.*, g.name as guest_name, g.email, " +
+        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
+                +
                 "rm.room_number, rm.room_type, rm.price_per_night " +
                 "FROM reservations r " +
                 "JOIN guests g ON r.guest_id = g.guest_id " +
@@ -103,7 +113,8 @@ public class ReservationRepository {
     public List<Reservation> findOverlappingReservations(String roomId, LocalDate checkIn, LocalDate checkOut)
             throws SQLException {
 
-        String sql = "SELECT r.*, g.name as guest_name, g.email, " +
+        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
+                +
                 "rm.room_number, rm.room_type, rm.price_per_night " +
                 "FROM reservations r " +
                 "JOIN guests g ON r.guest_id = g.guest_id " +
@@ -132,7 +143,8 @@ public class ReservationRepository {
     }
 
     public List<Reservation> findAll() throws SQLException {
-        String sql = "SELECT r.*, g.name as guest_name, g.email, " +
+        String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
+                +
                 "rm.room_number, rm.room_type, rm.price_per_night " +
                 "FROM reservations r " +
                 "JOIN guests g ON r.guest_id = g.guest_id " +
@@ -153,6 +165,7 @@ public class ReservationRepository {
 
     public Reservation update(Reservation reservation) throws SQLException {
         String sql = "UPDATE reservations SET status = ?, special_requests = ?, " +
+                "actual_check_in = ?, actual_check_out = ?, " +
                 "updated_at = CURRENT_TIMESTAMP WHERE reservation_id = ?";
 
         try (Connection conn = DatabaseHelper.getConnection();
@@ -160,11 +173,36 @@ public class ReservationRepository {
 
             pstmt.setString(1, reservation.getStatus());
             pstmt.setString(2, reservation.getSpecialRequests());
-            pstmt.setString(3, reservation.getReservationId());
+            pstmt.setTimestamp(3,
+                    reservation.getActualCheckIn() != null ? Timestamp.valueOf(reservation.getActualCheckIn()) : null);
+            pstmt.setTimestamp(4,
+                    reservation.getActualCheckOut() != null ? Timestamp.valueOf(reservation.getActualCheckOut())
+                            : null);
+            pstmt.setString(5, reservation.getReservationId());
 
             pstmt.executeUpdate();
             System.out.println("✅ Reservation updated: " + reservation.getReservationNumber());
             return reservation;
+        }
+    }
+
+    public void updateCheckIn(String reservationId, LocalDateTime checkInTime) throws SQLException {
+        String sql = "UPDATE reservations SET actual_check_in = ?, status = 'CHECKED_IN', updated_at = CURRENT_TIMESTAMP WHERE reservation_id = ?";
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(checkInTime));
+            pstmt.setString(2, reservationId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void updateCheckOut(String reservationId, LocalDateTime checkOutTime) throws SQLException {
+        String sql = "UPDATE reservations SET actual_check_out = ?, status = 'COMPLETED', updated_at = CURRENT_TIMESTAMP WHERE reservation_id = ?";
+        try (Connection conn = DatabaseHelper.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(checkOutTime));
+            pstmt.setString(2, reservationId);
+            pstmt.executeUpdate();
         }
     }
 
@@ -185,6 +223,11 @@ public class ReservationRepository {
         guest.setGuestId(rs.getString("guest_id"));
         guest.setName(rs.getString("guest_name"));
         guest.setEmail(rs.getString("email"));
+        guest.setContactNumber(rs.getString("contact_number"));
+        guest.setAddress(rs.getString("address"));
+        guest.setIdType(rs.getString("id_type"));
+        guest.setIdNumber(rs.getString("id_number"));
+        guest.setNationality(rs.getString("nationality"));
 
         Room room = new Room();
         room.setRoomId(rs.getString("room_id"));
@@ -203,6 +246,14 @@ public class ReservationRepository {
         res.setTotalCost(rs.getBigDecimal("total_cost"));
         res.setStatus(rs.getString("status"));
         res.setSpecialRequests(rs.getString("special_requests"));
+
+        Timestamp actualCheckIn = rs.getTimestamp("actual_check_in");
+        if (actualCheckIn != null)
+            res.setActualCheckIn(actualCheckIn.toLocalDateTime());
+
+        Timestamp actualCheckOut = rs.getTimestamp("actual_check_out");
+        if (actualCheckOut != null)
+            res.setActualCheckOut(actualCheckOut.toLocalDateTime());
 
         return res;
     }

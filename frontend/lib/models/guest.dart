@@ -4,7 +4,9 @@ class Guest {
   final String email;
   final String contactNumber;
   final String address;
-  final String passportNumber;
+  final String idType;
+  final String idNumber;
+  final String nationality;
 
   Guest({
     required this.guestId,
@@ -12,7 +14,9 @@ class Guest {
     required this.email,
     required this.contactNumber,
     required this.address,
-    required this.passportNumber,
+    required this.idType,
+    required this.idNumber,
+    required this.nationality,
   });
 
   factory Guest.fromJson(Map<String, dynamic> json) {
@@ -22,7 +26,9 @@ class Guest {
       email: json['email'] ?? '',
       contactNumber: json['contactNumber'] ?? '',
       address: json['address'] ?? '',
-      passportNumber: json['passportNumber'] ?? '',
+      idType: json['idType'] ?? '',
+      idNumber: json['idNumber'] ?? '',
+      nationality: json['nationality'] ?? '',
     );
   }
 
@@ -33,7 +39,9 @@ class Guest {
       'email': email,
       'contactNumber': contactNumber,
       'address': address,
-      'passportNumber': passportNumber,
+      'idType': idType,
+      'idNumber': idNumber,
+      'nationality': nationality,
     };
   }
 }

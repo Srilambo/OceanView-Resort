@@ -17,16 +17,28 @@ class UserModel {
     this.enabled = true,
   });
 
+  // Helper getter to get a user-friendly role name for display
+  String get displayRole {
+    final curRole = userRole;
+    if (curRole == UserRole.ADMIN) return 'Admin';
+    if (curRole == UserRole.STAFF) return 'Staff';
+    return 'Guest';
+  }
+
   // Helper getter to get UserRole enum
   UserRole get userRole {
     switch (role.toUpperCase()) {
       case 'ADMIN':
-        return UserRole.ADMIN;
       case 'MANAGER':
-        return UserRole.MANAGER;
+      case 'ROLE_ADMIN':
+      case 'ROLE_MANAGER':
+        return UserRole.ADMIN;
       case 'STAFF':
+      case 'ROLE_STAFF':
         return UserRole.STAFF;
       case 'GUEST':
+      case 'ROLE_USER':
+      case 'USER':
       default:
         return UserRole.GUEST;
     }
@@ -38,11 +50,11 @@ class UserModel {
     if (json['roles'] != null) {
       if (json['roles'] is List) {
         List<dynamic> rolesList = json['roles'];
-        if (rolesList.contains('ADMIN') || rolesList.contains('ROLE_ADMIN')) {
-          extractedRole = 'ADMIN';
-        } else if (rolesList.contains('MANAGER') ||
+        if (rolesList.contains('ADMIN') ||
+            rolesList.contains('ROLE_ADMIN') ||
+            rolesList.contains('MANAGER') ||
             rolesList.contains('ROLE_MANAGER')) {
-          extractedRole = 'MANAGER';
+          extractedRole = 'ADMIN';
         } else if (rolesList.contains('STAFF') ||
             rolesList.contains('ROLE_STAFF')) {
           extractedRole = 'STAFF';

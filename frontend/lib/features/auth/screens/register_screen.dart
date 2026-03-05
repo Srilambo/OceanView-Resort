@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../services/api_service.dart';
-import '../../../models/user.dart';
-import '../../user/home/screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../../authentication/providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,7 +13,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _emailController = TextEditingController();
-  bool _isLoading = false;
   String? _errorMessage;
 
   Future<void> _register() async {
@@ -27,34 +25,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    await auth.register(
+      _usernameController.text,
+      _passwordController.text,
+      _emailController.text,
+    );
 
-    try {
-      final User user = await ApiService.register(
-        _usernameController.text,
-        _passwordController.text,
-        _emailController.text,
+    if (auth.isLoggedIn && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Registration successful! Welcome to the resort.')),
       );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Registration successful! Logging you in...')),
-        );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen(user: user)),
-        );
-      }
-    } catch (e) {
+      // AuthProvider will trigger AppNavigation to show the correct screen
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } else if (auth.error != null && mounted) {
       setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
+        _errorMessage = auth.error!.replaceAll('Exception: ', '');
       });
     }
   }
@@ -146,29 +133,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                     const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _register,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
-                            : const Text(
-                                'REGISTER',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                    Consumer<AuthProvider>(
+                      builder: (context, auth, _) {
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: auth.isLoading ? null : _register,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                      ),
+                            ),
+                            child: auth.isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text(
+                                    'REGISTER',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     TextButton(
