@@ -130,6 +130,19 @@ class _RoomManagementViewState extends State<RoomManagementView> {
     );
   }
 
+  String _getRoomImage(String type) {
+    final t = type.trim().toUpperCase();
+    if (t.contains('DELUXE')) {
+      return 'assets/images/room2_garden_deluxe_img1.png';
+    } else if (t.contains('SUITE')) {
+      return 'assets/images/room1_ocean_suite_img1.png';
+    } else if (t.contains('VILLA')) {
+      return 'assets/images/room3_presidential_suite_img1.png';
+    } else {
+      return 'assets/images/luxury_room.png';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -228,11 +241,15 @@ class _RoomManagementViewState extends State<RoomManagementView> {
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
-                                            const Icon(Icons.hotel,
-                                                color: Color(0xFF009688)),
+                                            Image.asset(
+                                      _getRoomImage(room.roomType),
+                                      fit: BoxFit.cover,
+                                    ),
                                   )
-                                : const Icon(Icons.hotel,
-                                    color: Color(0xFF009688)),
+                                : Image.asset(
+                                    _getRoomImage(room.roomType),
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                         title: Text(

@@ -1,6 +1,5 @@
 package com.oceanview.admin;
 
-import com.oceanview.service.UserService;
 import com.oceanview.model.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +8,6 @@ import com.oceanview.util.LocalDateTimeAdapter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.List;
 
 public class AdminWebService {
     private AdminService adminService;

@@ -36,8 +36,8 @@ public class StaffService {
             }
 
             // Generate staff ID if not provided
-            if (staff.getStaffId() == null || staff.getStaffId().isEmpty()) {
-                staff.setStaffId(UUID.randomUUID().toString());
+            if (staff.getStaffId() == null || staff.getStaffId().isEmpty() || staff.getStaffId().length() == 36) {
+                staff.setStaffId(com.oceanview.db.DatabaseHelper.generateId("staff", "staff_id", "staff"));
             }
 
             // Set defaults if not provided
@@ -49,7 +49,7 @@ public class StaffService {
             }
 
             // Also create a user account with ROLE_STAFF
-            User user = new User(UUID.randomUUID().toString(),
+            User user = new User(com.oceanview.db.DatabaseHelper.generateId("users", "user_id", "staff-user"),
                     staff.getEmail().split("@")[0], // username from email
                     "staff123", // default password
                     staff.getEmail());

@@ -14,6 +14,8 @@ class Reservation {
   final String status;
   final String? specialRequests;
   final String roomType;
+  final String? paymentMethod;
+  final String? paymentStatus;
 
   Reservation({
     required this.reservationId,
@@ -31,6 +33,8 @@ class Reservation {
     required this.status,
     this.specialRequests,
     required this.roomType,
+    this.paymentMethod,
+    this.paymentStatus,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
@@ -58,6 +62,8 @@ class Reservation {
       status: json['status'] ?? 'PENDING',
       specialRequests: json['specialRequests'],
       roomType: json['room']?['roomType'] ?? '',
+      paymentMethod: json['paymentMethod'],
+      paymentStatus: json['paymentStatus'],
     );
   }
 
@@ -69,7 +75,7 @@ class Reservation {
       'guestName': guestName,
       'roomId': roomId,
       'roomNumber': roomNumber,
-      'checkInDate': checkInDate.toString().split(' ')[0],
+      'checkInDate': checkInDate.toIso8601String(),
       'checkOutDate': checkOutDate.toIso8601String(),
       'actualCheckIn': actualCheckIn?.toIso8601String(),
       'actualCheckOut': actualCheckOut?.toIso8601String(),
@@ -78,6 +84,8 @@ class Reservation {
       'status': status,
       'specialRequests': specialRequests,
       'roomType': roomType,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
     };
   }
 }

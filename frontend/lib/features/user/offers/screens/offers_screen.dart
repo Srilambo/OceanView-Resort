@@ -20,7 +20,7 @@ class OffersScreen extends StatelessWidget {
                 colors: [
                   AppColors.darkBg,
                   AppColors.darkBgSecondary,
-                  AppColors.darkBgTertiary,
+                  AppColors.darkBgSecondary,
                 ],
               ),
             ),
@@ -56,7 +56,7 @@ class OffersScreen extends StatelessWidget {
                             'A romantic escape featuring champagne on arrival, a couples massage, and a private beach breakfast.',
                         discount: 'Special',
                         isReversed: true,
-                        imagePath: 'assets/images/luxury_room.png',
+                        imagePath: 'assets/images/room1_ocean_suite_img1.png',
                       ),
                       const SizedBox(height: 32),
                       const _OfferCard(
@@ -64,7 +64,7 @@ class OffersScreen extends StatelessWidget {
                         description:
                             'Plan your getaway at least 60 days in advance and receive an exclusive 15% discount on your entire stay.',
                         discount: '15%',
-                        imagePath: 'assets/images/luxury_pool.png',
+                        imagePath: 'assets/images/room2_garden_deluxe_img2.png',
                       ),
                     ],
                   ),
@@ -90,7 +90,7 @@ class _OffersHero extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const AssetImage('assets/images/luxury_pool.png'),
+          image: const AssetImage('assets/images/hero_beach_landing.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Colors.black.withOpacity(0.4),
@@ -193,6 +193,20 @@ class _OfferCard extends StatelessWidget {
                 height: 300,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 300,
+                    width: double.infinity,
+                    color: AppColors.darkBgSecondary,
+                    child: Center(
+                      child: Icon(
+                        Icons.local_offer_outlined,
+                        size: 60,
+                        color: AppColors.goldAccent.withOpacity(0.2),
+                      ),
+                    ),
+                  );
+                },
               ),
               Positioned(
                 top: 24,
@@ -269,4 +283,3 @@ class _OfferCard extends StatelessWidget {
     );
   }
 }
-

@@ -5,7 +5,6 @@ import com.oceanview.model.Guest;
 import com.oceanview.model.Room;
 import com.oceanview.db.DatabaseHelper;
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -13,9 +12,9 @@ public class ReservationRepository {
 
     public Reservation save(Reservation reservation) throws SQLException {
         String sql = "INSERT INTO reservations (reservation_id, reservation_number, guest_id, room_id, " +
-                "check_in_date, check_out_date, actual_check_in, actual_check_out, number_of_nights, total_cost, status, special_requests) "
+                "check_in_date, check_out_date, actual_check_in, actual_check_out, number_of_nights, total_cost, status, special_requests, payment_method, payment_status) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -24,8 +23,8 @@ public class ReservationRepository {
             pstmt.setString(2, reservation.getReservationNumber());
             pstmt.setString(3, reservation.getGuest().getGuestId());
             pstmt.setString(4, reservation.getRoom().getRoomId());
-            pstmt.setString(5, reservation.getCheckInDate().toString());
-            pstmt.setString(6, reservation.getCheckOutDate().toString());
+            pstmt.setTimestamp(5, Timestamp.valueOf(reservation.getCheckInDate()));
+            pstmt.setTimestamp(6, Timestamp.valueOf(reservation.getCheckOutDate()));
             pstmt.setTimestamp(7,
                     reservation.getActualCheckIn() != null ? Timestamp.valueOf(reservation.getActualCheckIn()) : null);
             pstmt.setTimestamp(8,
@@ -35,6 +34,8 @@ public class ReservationRepository {
             pstmt.setBigDecimal(10, reservation.getTotalCost());
             pstmt.setString(11, reservation.getStatus());
             pstmt.setString(12, reservation.getSpecialRequests());
+            pstmt.setString(13, reservation.getPaymentMethod());
+            pstmt.setString(14, reservation.getPaymentStatus());
 
             pstmt.executeUpdate();
             System.out.println("✅ Reservation saved: " + reservation.getReservationNumber());
@@ -110,7 +111,7 @@ public class ReservationRepository {
         return reservations;
     }
 
-    public List<Reservation> findOverlappingReservations(String roomId, LocalDate checkIn, LocalDate checkOut)
+    public List<Reservation> findOverlappingReservations(String roomId, LocalDateTime checkIn, LocalDateTime checkOut)
             throws SQLException {
 
         String sql = "SELECT r.*, g.name as guest_name, g.email, g.contact_number, g.address, g.id_type, g.id_number, g.nationality, "
@@ -130,8 +131,8 @@ public class ReservationRepository {
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, roomId);
-            pstmt.setString(2, checkIn.toString());
-            pstmt.setString(3, checkOut.toString());
+            pstmt.setTimestamp(2, Timestamp.valueOf(checkIn));
+            pstmt.setTimestamp(3, Timestamp.valueOf(checkOut));
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -240,12 +241,14 @@ public class ReservationRepository {
         res.setReservationNumber(rs.getString("reservation_number"));
         res.setGuest(guest);
         res.setRoom(room);
-        res.setCheckInDate(rs.getDate("check_in_date").toLocalDate());
-        res.setCheckOutDate(rs.getDate("check_out_date").toLocalDate());
+        res.setCheckInDate(rs.getTimestamp("check_in_date").toLocalDateTime());
+        res.setCheckOutDate(rs.getTimestamp("check_out_date").toLocalDateTime());
         res.setNumberOfNights(rs.getInt("number_of_nights"));
         res.setTotalCost(rs.getBigDecimal("total_cost"));
         res.setStatus(rs.getString("status"));
         res.setSpecialRequests(rs.getString("special_requests"));
+        res.setPaymentMethod(rs.getString("payment_method"));
+        res.setPaymentStatus(rs.getString("payment_status"));
 
         Timestamp actualCheckIn = rs.getTimestamp("actual_check_in");
         if (actualCheckIn != null)

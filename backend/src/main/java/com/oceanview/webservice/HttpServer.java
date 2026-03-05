@@ -192,6 +192,16 @@ public class HttpServer {
                 return roomService.deleteRoom(id);
             }
 
+            // ========== Guest Endpoints ==========
+            if (path.matches("/api/guests/user/[a-zA-Z0-9-]+") && method.equals("GET")) {
+                String userId = path.substring("/api/guests/user/".length());
+                return userService.getGuestByUserId(userId);
+            }
+
+            if (path.equals("/api/guests") && method.equals("PUT")) {
+                return userService.updateGuest(body);
+            }
+
             // Reservations
             if (path.equals("/api/reservations") && method.equals("GET")) {
                 return reservationService.getAllReservations();

@@ -2,6 +2,7 @@ package com.oceanview.webservice;
 
 import com.oceanview.service.UserService;
 import com.oceanview.model.User;
+import com.oceanview.model.Guest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.oceanview.util.LocalDateAdapter;
@@ -24,9 +25,9 @@ public class UserWebService {
 
     public String login(String jsonBody) {
         try {
-            Map<String, String> credentials = gson.fromJson(jsonBody, Map.class);
-            String username = credentials.get("username");
-            String password = credentials.get("password");
+            Map<String, Object> credentials = gson.fromJson(jsonBody, Map.class);
+            String username = (String) credentials.get("username");
+            String password = (String) credentials.get("password");
 
             User user = userService.authenticate(username, password);
 
@@ -136,4 +137,27 @@ public class UserWebService {
         }
     }
 
+    // ========== Guest Profiling (Merged here) ==========
+
+    public String getGuestByUserId(String userId) {
+        try {
+            Guest guest = userService.getGuestByUserId(userId);
+            if (guest == null) {
+                return buildJsonResponse(404, "{\"error\": \"Guest not found for user ID: " + userId + "\"}");
+            }
+            return buildJsonResponse(200, gson.toJson(guest));
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
+
+    public String updateGuest(String jsonBody) {
+        try {
+            Guest guest = gson.fromJson(jsonBody, Guest.class);
+            Guest updated = userService.updateGuest(guest);
+            return buildJsonResponse(200, gson.toJson(updated));
+        } catch (Exception e) {
+            return buildJsonResponse(500, "{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}");
+        }
+    }
 }

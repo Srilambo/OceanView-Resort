@@ -9,6 +9,7 @@ import '../models/staff.dart';
 import '../models/task.dart';
 import '../models/resort_service.dart';
 import '../models/review.dart';
+import '../models/guest.dart';
 
 class ApiService {
   // Adjust this based on where your backend runs.
@@ -88,9 +89,11 @@ class ApiService {
             body: jsonEncode({
               'guest': {'guestId': guestId},
               'room': {'roomId': roomId},
-              'checkInDate': checkInDate.toString().split(' ')[0],
-              'checkOutDate': checkOutDate.toString().split(' ')[0],
+              'checkInDate': checkInDate.toIso8601String(),
+              'checkOutDate': checkOutDate.toIso8601String(),
               'specialRequests': specialRequests,
+              'paymentMethod': 'CASH',
+              'paymentStatus': 'PENDING_STAFF_CHECK',
             }),
           )
           .timeout(const Duration(seconds: 10));
@@ -716,6 +719,44 @@ class ApiService {
 
       if (response.statusCode != 200) {
         throw Exception('Failed to check out');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  // ========== Guest Management ==========
+
+  static Future<Guest> getGuestByUserId(String userId) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/guests/user/$userId'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return Guest.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Guest not found');
+      }
+    } catch (e) {
+      throw Exception('Connection error: $e');
+    }
+  }
+
+  static Future<Guest> updateGuest(Guest guest) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/guests'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(guest.toJson()),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return Guest.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to update guest profile');
       }
     } catch (e) {
       throw Exception('Connection error: $e');

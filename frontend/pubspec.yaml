@@ -50,7 +50,15 @@ flutter:
   assets:
     - assets/images/
     - assets/images/hero-beach.jpg
+    - assets/images/hero_beach_landing.png
     - assets/images/luxury_pool.png
     - assets/images/luxury_room.png
     - assets/images/resort_hero.png
+    - assets/images/room1_ocean_suite_img1.png
+    - assets/images/room1_ocean_suite_img2.png
+    - assets/images/room2_garden_deluxe_img1.png
+    - assets/images/room2_garden_deluxe_img2.png
+    - assets/images/room3_presidential_suite_img1.png
+    - assets/images/staff_task_banner.png
+    - assets/images/admin_reports_banner.png
     - assets/icons/

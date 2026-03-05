@@ -27,7 +27,7 @@ class HeroSectionWidget extends StatelessWidget {
           ],
         ),
         image: DecorationImage(
-          image: const AssetImage('assets/images/hero-beach.jpg'),
+          image: const AssetImage('assets/images/hero_beach_landing.png'),
           fit: BoxFit.cover,
           opacity: (0.25 + (scrollProgress * 0.1)).clamp(0, 1),
           onError: (exception, stackTrace) {},

@@ -184,6 +184,19 @@ class _ServicesViewState extends State<ServicesView>
       }
     }
 
+    String getServiceImage(String category) {
+      switch (category.toUpperCase()) {
+        case 'WELLNESS':
+          return 'assets/images/luxury_pool.png';
+        case 'ADVENTURE':
+          return 'assets/images/hero_beach_landing.png';
+        case 'DINING':
+          return 'assets/images/room1_ocean_suite_img2.png';
+        default:
+          return 'assets/images/resort_hero.png';
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -202,19 +215,31 @@ class _ServicesViewState extends State<ServicesView>
         children: [
           // Header Image Area
           Container(
-            height: 120,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
+            height: 140,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(getServiceImage(service.category)),
+                fit: BoxFit.cover,
+                onError: (exception, stackTrace) {},
               ),
             ),
-            child: Center(
-              child: Icon(
-                getIcon(service.icon),
-                size: 60,
-                color: Colors.white.withOpacity(0.8),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.6),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  getIcon(service.icon),
+                  size: 60,
+                  color: Colors.white.withOpacity(0.9),
+                ),
               ),
             ),
           ),

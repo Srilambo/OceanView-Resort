@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../../models/room.dart';
 import '../../../../services/api_service.dart';
+import '../../../authentication/providers/auth_provider.dart';
 
 class BrowseRoomsView extends StatefulWidget {
   const BrowseRoomsView({Key? key}) : super(key: key);
@@ -100,8 +103,16 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
   }
 
   String _getRoomImage(String type) {
-    // All rooms use the same asset for now
-    return 'assets/images/luxury_room.png';
+    final t = type.trim().toUpperCase();
+    if (t.contains('DELUXE')) {
+      return 'assets/images/room2_garden_deluxe_img1.png';
+    } else if (t.contains('SUITE')) {
+      return 'assets/images/room1_ocean_suite_img1.png';
+    } else if (t.contains('VILLA') || t.contains('PENTHOUSE')) {
+      return 'assets/images/room3_presidential_suite_img1.png';
+    } else {
+      return 'assets/images/luxury_room.png';
+    }
   }
 
   @override
@@ -432,6 +443,9 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
                     image: DecorationImage(
                       image: AssetImage(_getRoomImage(room.roomType)),
                       fit: BoxFit.cover,
+                      onError: (exception, stackTrace) {
+                        // Log or handle error implicitly
+                      },
                     ),
                   ),
                   child: Container(
@@ -680,203 +694,543 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
 
   void _showRoomDetails(Room room) {
     final typeColor = _getRoomTypeColor(room.roomType);
+    int selectedGuests = 1;
+
+    // Initialize with default times (e.g., today 2 PM for check-in, tomorrow 11 AM for check-out)
+    DateTime checkIn =
+        DateTime.now().add(const Duration(hours: 14 - 20)); // Adjust to 2 PM
+    if (checkIn.hour < 14) {
+      checkIn = DateTime(checkIn.year, checkIn.month, checkIn.day, 14, 0);
+    }
+    DateTime checkOut = checkIn.add(const Duration(days: 1));
+    checkOut = DateTime(checkOut.year, checkOut.month, checkOut.day, 11, 0);
+
+    final DateFormat formatter = DateFormat('MMM dd, yyyy - hh:mm a');
+    int currentStep = 1; // 1: Details, 2: Payment/Summary
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          width: 500,
-          constraints: const BoxConstraints(maxHeight: 650),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image Header
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                  image: DecorationImage(
-                    image: AssetImage(_getRoomImage(room.roomType)),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.5),
-                      ],
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: typeColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          room.roomType,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Room ${room.roomNumber}',
-                        style: GoogleFonts.playfairDisplay(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          double totalCost =
+              room.pricePerNight * checkOut.difference(checkIn).inDays;
+          if (totalCost <= 0)
+            totalCost =
+                room.pricePerNight; // Minimum 1 night cost for small durations
+          Future<void> selectDateTime(bool isCheckIn) async {
+            final DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: isCheckIn ? checkIn : checkOut,
+              firstDate: DateTime.now(),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
 
-              // Details
-              Padding(
-                padding: const EdgeInsets.all(24),
+            if (pickedDate != null) {
+              final TimeOfDay? pickedTime = await showTimePicker(
+                context: context,
+                initialTime:
+                    TimeOfDay.fromDateTime(isCheckIn ? checkIn : checkOut),
+              );
+
+              if (pickedTime != null) {
+                setState(() {
+                  final newDateTime = DateTime(
+                    pickedDate.year,
+                    pickedDate.month,
+                    pickedDate.day,
+                    pickedTime.hour,
+                    pickedTime.minute,
+                  );
+                  if (isCheckIn) {
+                    checkIn = newDateTime;
+                    if (checkOut
+                        .isBefore(checkIn.add(const Duration(hours: 2)))) {
+                      checkOut = checkIn.add(const Duration(days: 1));
+                      checkOut = DateTime(
+                          checkOut.year, checkOut.month, checkOut.day, 11, 0);
+                    }
+                  } else {
+                    if (newDateTime.isAfter(checkIn)) {
+                      checkOut = newDateTime;
+                    }
+                  }
+                });
+              }
+            }
+          }
+
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Container(
+              width: 550,
+              constraints: const BoxConstraints(maxHeight: 750),
+              child: SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Room Description',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0D47A1),
+                    // Image Header
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                        image: DecorationImage(
+                          image: AssetImage(_getRoomImage(room.roomType)),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.5),
+                            ],
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: typeColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                room.roomType,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Room ${room.roomNumber}',
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      room.description,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        color: Colors.grey.shade700,
-                        height: 1.6,
+
+                    // Details
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Room Description',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF0D47A1),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            room.description,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 13,
+                              color: Colors.grey.shade700,
+                              height: 1.6,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          if (currentStep == 1) ...[
+                            // Step 1: Selection
+                            // Date & Time Selection
+                            Text(
+                              'STAY DURATION',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade500,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDateTile(
+                                    'IN DATE & TIME',
+                                    formatter.format(checkIn),
+                                    Icons.login_rounded,
+                                    () => selectDateTime(true),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildDateTile(
+                                    'OUT DATE & TIME',
+                                    formatter.format(checkOut),
+                                    Icons.logout_rounded,
+                                    () => selectDateTime(false),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Info Grid
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildGuestSelectorTile(
+                                    selectedGuests,
+                                    room.capacity,
+                                    (val) =>
+                                        setState(() => selectedGuests = val),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildInfoTile(
+                                    Icons.attach_money,
+                                    'Price',
+                                    '\$${room.pricePerNight.toStringAsFixed(0)}/night',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildInfoTile(
+                                    Icons.meeting_room,
+                                    'Room No.',
+                                    room.roomNumber,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildInfoTile(
+                                    room.available
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    'Status',
+                                    room.available ? 'Available' : 'Booked',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ] else ...[
+                            // Step 2: Payment Summary
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.blue.shade100),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'BOOKING SUMMARY',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF1565C0),
+                                    ),
+                                  ),
+                                  const Divider(height: 20),
+                                  _buildSummaryRow('Duration',
+                                      '${checkOut.difference(checkIn).inDays} Nights'),
+                                  _buildSummaryRow('Guests', '$selectedGuests'),
+                                  const Divider(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'TOTAL AMOUNT',
+                                        style: GoogleFonts.montserrat(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Text(
+                                        '\$${totalCost.toStringAsFixed(2)}',
+                                        style: GoogleFonts.montserrat(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          color: const Color(0xFF1565C0),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'PAYMENT METHOD',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    Border.all(color: Colors.green.shade200),
+                                color: Colors.green.shade50,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.payments_rounded,
+                                      color: Colors.green),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Cash on Booking',
+                                        style: GoogleFonts.montserrat(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                          color: Colors.green.shade800,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Pay at the resort counter',
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 11,
+                                          color: Colors.green.shade700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  const Icon(Icons.check_circle,
+                                      color: Colors.green),
+                                ],
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(height: 24),
+
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    if (currentStep == 2) {
+                                      setState(() => currentStep = 1);
+                                    } else {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.grey.shade700,
+                                    side:
+                                        BorderSide(color: Colors.grey.shade300),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    currentStep == 2 ? 'Back' : 'Close',
+                                    style: GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: ElevatedButton.icon(
+                                  onPressed: room.available
+                                      ? () {
+                                          if (currentStep == 1) {
+                                            setState(() => currentStep = 2);
+                                          } else {
+                                            _bookRoom(room, selectedGuests,
+                                                checkIn, checkOut);
+                                          }
+                                        }
+                                      : null,
+                                  icon: Icon(
+                                      currentStep == 1
+                                          ? Icons.arrow_forward_rounded
+                                          : Icons.check_circle_rounded,
+                                      size: 18),
+                                  label: Text(
+                                    currentStep == 1
+                                        ? 'Continue to Payment'
+                                        : 'Confirm Payment & Book',
+                                    style: GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: currentStep == 1
+                                        ? const Color(0xFF1565C0)
+                                        : Colors.green.shade700,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Info Grid
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildInfoTile(
-                            Icons.people,
-                            'Capacity',
-                            '${room.capacity} Guests',
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildInfoTile(
-                            Icons.attach_money,
-                            'Price',
-                            '\$${room.pricePerNight.toStringAsFixed(0)}/night',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildInfoTile(
-                            Icons.meeting_room,
-                            'Room No.',
-                            room.roomNumber,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildInfoTile(
-                            room.available ? Icons.check_circle : Icons.cancel,
-                            'Status',
-                            room.available ? 'Available' : 'Booked',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Action Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.grey.shade700,
-                              side: BorderSide(color: Colors.grey.shade300),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Text(
-                              'Close',
-                              style: GoogleFonts.montserrat(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          flex: 2,
-                          child: ElevatedButton.icon(
-                            onPressed:
-                                room.available ? () => _bookRoom(room) : null,
-                            icon: const Icon(Icons.book_online, size: 18),
-                            label: Text(
-                              'Book Now',
-                              style: GoogleFonts.montserrat(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1565C0),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 2,
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateTile(
+      String label, String value, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1565C0).withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF1565C0).withOpacity(0.1)),
         ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 14, color: const Color(0xFF1565C0)),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1565C0),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: GoogleFonts.montserrat(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestSelectorTile(
+      int current, int max, Function(int) onChanged) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.people, size: 20, color: Color(0xFF1565C0)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Guests',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 10,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: current > 1 ? () => onChanged(current - 1) : null,
+                      child: Icon(Icons.remove_circle_outline,
+                          size: 18,
+                          color: current > 1
+                              ? const Color(0xFF1565C0)
+                              : Colors.grey),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        '$current',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap:
+                          current < max ? () => onChanged(current + 1) : null,
+                      child: Icon(Icons.add_circle_outline,
+                          size: 18,
+                          color: current < max
+                              ? const Color(0xFF1565C0)
+                              : Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -897,6 +1251,7 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 2),
                 Text(
                   label,
                   style: GoogleFonts.montserrat(
@@ -905,7 +1260,6 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
                 Text(
                   value,
                   style: GoogleFonts.montserrat(
@@ -922,52 +1276,91 @@ class _BrowseRoomsViewState extends State<BrowseRoomsView> {
     );
   }
 
-  Future<void> _bookRoom(Room room) async {
+  Future<void> _bookRoom(
+      Room room, int numGuests, DateTime checkIn, DateTime checkOut) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please login to book a room'),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     Navigator.pop(context);
 
-    final DateTimeRange? dateRange = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF1565C0),
-            ),
-          ),
-          child: child!,
-        );
-      },
-      helpText: 'Select Booking Dates',
-    );
+    try {
+      // Get guest ID from user ID
+      final guest =
+          await ApiService.getGuestByUserId(authProvider.currentUser!.id);
 
-    if (dateRange != null) {
-      try {
-        await ApiService.createReservation(
-          guestId: 'guest-sri-001',
-          roomId: room.roomId,
-          checkInDate: dateRange.start,
-          checkOutDate: dateRange.end,
-        );
+      await ApiService.createReservation(
+        guestId: guest.guestId,
+        roomId: room.roomId,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        specialRequests: 'Guests: $numGuests',
+      );
 
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Room ${room.roomNumber} booked successfully!'),
-            backgroundColor: Colors.green,
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 12),
+              Text('Room ${room.roomNumber} booked for $numGuests guests!'),
+            ],
           ),
-        );
-        _loadRooms(); // Refresh rooms list
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to book room: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+          backgroundColor: Colors.green.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      _loadRooms(); // Refresh rooms list
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to book room: $e'),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
     }
   }
+
+  Widget _buildSummaryRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper extension/method for fonts if needed, but I'll stick to GoogleFonts
 }

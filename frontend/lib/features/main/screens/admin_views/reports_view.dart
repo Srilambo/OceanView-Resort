@@ -36,6 +36,56 @@ class _ReportsViewState extends State<ReportsView> {
     },
   ];
 
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      height: 180,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/admin_reports_banner.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              const Color(0xFF003366).withOpacity(0.9),
+              const Color(0xFF003366).withOpacity(0.3),
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Analytical Overview',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Comprehensive metrics and deep-dive resort reporting',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,15 +93,17 @@ class _ReportsViewState extends State<ReportsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildHeader(),
+          const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Reports',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 32,
+                'Reports Repository',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0D47A1),
+                  color: const Color(0xFF1A1A2E),
                 ),
               ),
               ElevatedButton.icon(

@@ -128,15 +128,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Resort Management Center',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF0D47A1),
-            ),
-          ),
-          const SizedBox(height: 24),
+          _buildHeader(),
+          const SizedBox(height: 12),
 
           // KPI Cards
           GridView.count(
@@ -212,6 +205,65 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/resort_hero.png'),
+          fit: BoxFit.cover,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF0D47A1).withOpacity(0.8),
+              const Color(0xFF0D47A1).withOpacity(0.2),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Command Center',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Oversee all operations of Ocean View Resort',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.9),
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

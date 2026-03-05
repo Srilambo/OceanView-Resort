@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS guests (
     id_type VARCHAR(50), -- Passport, National ID, etc.
     id_number VARCHAR(50),
     nationality VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    user_id VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS rooms (
@@ -46,14 +48,16 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_number VARCHAR(20) UNIQUE NOT NULL,
     guest_id VARCHAR(50),
     room_id VARCHAR(50),
-    check_in_date DATE NOT NULL,
-    check_out_date DATE NOT NULL,
+    check_in_date DATETIME NOT NULL,
+    check_out_date DATETIME NOT NULL,
     actual_check_in DATETIME,
     actual_check_out DATETIME,
     number_of_nights INT,
     total_cost DECIMAL(10, 2),
     status VARCHAR(20) DEFAULT 'PENDING',
     special_requests TEXT,
+    payment_method VARCHAR(50),
+    payment_status VARCHAR(50) DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id),
@@ -171,9 +175,9 @@ REPLACE INTO users (user_id, username, password, email) VALUES
 REPLACE INTO user_roles (user_id, role) VALUES
 ('user-sri-001', 'ROLE_USER');
 
-INSERT INTO guests (guest_id, name, email, contact_number, address, id_type, id_number, nationality) VALUES
-('guest-sri-001', 'Sri Kumar', 'sri@oceanview.com', '+94771112233', '42 Beach Road, Colombo', 'Passport', 'N1234567', 'Sri Lankan')
-ON DUPLICATE KEY UPDATE name=name;
+INSERT INTO guests (guest_id, user_id, name, email, contact_number, address, id_type, id_number, nationality) VALUES
+('guest-sri-001', 'user-sri-001', 'Sri Kumar', 'sri@oceanview.com', '+94771112233', '42 Beach Road, Colombo', 'Passport', 'N1234567', 'Sri Lankan')
+ON DUPLICATE KEY UPDATE name=name, user_id=VALUES(user_id);
 
 -- ========== Demo Reservations ==========
 INSERT INTO reservations (reservation_id, reservation_number, guest_id, room_id, check_in_date, check_out_date, number_of_nights, total_cost, status, special_requests) VALUES

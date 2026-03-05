@@ -21,7 +21,7 @@ class RoomsScreen extends StatelessWidget {
                 colors: [
                   AppColors.darkBg,
                   AppColors.darkBgSecondary,
-                  AppColors.darkBgTertiary,
+                  AppColors.darkBgSecondary,
                 ],
               ),
             ),
@@ -55,7 +55,7 @@ class RoomsScreen extends StatelessWidget {
                         description:
                             'Wake up to the sound of waves in our premier suite featuring a private balcony and panoramic ocean views.',
                         price: '450',
-                        imagePath: 'assets/images/luxury_room.png',
+                        imagePath: 'assets/images/room1_ocean_suite_img2.png',
                       ),
                       const SizedBox(height: 32),
                       const _RoomCard(
@@ -64,8 +64,7 @@ class RoomsScreen extends StatelessWidget {
                             'A serene escape surrounded by lush tropical greenery, perfect for those seeking tranquility.',
                         price: '320',
                         isReversed: true,
-                        imagePath:
-                            'assets/images/luxury_room.png', // Reusing for now
+                        imagePath: 'assets/images/room2_garden_deluxe_img1.png',
                       ),
                       const SizedBox(height: 32),
                       const _RoomCard(
@@ -74,7 +73,7 @@ class RoomsScreen extends StatelessWidget {
                             'The pinnacle of luxury. Private pool, butler service, and the most expansive views in the resort.',
                         price: '1,200',
                         imagePath:
-                            'assets/images/luxury_room.png', // Reusing for now
+                            'assets/images/room3_presidential_suite_img1.png',
                       ),
                     ],
                   ),
@@ -101,8 +100,9 @@ class _RoomsHero extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const AssetImage('assets/images/luxury_room.png'),
+          image: const AssetImage('assets/images/resort_hero.png'),
           fit: BoxFit.cover,
+          onError: (exception, stackTrace) {},
           colorFilter: ColorFilter.mode(
             Colors.black.withOpacity(0.4),
             BlendMode.darken,
@@ -202,6 +202,7 @@ class _RoomCard extends StatelessWidget {
             image: DecorationImage(
               image: AssetImage(imagePath),
               fit: BoxFit.cover,
+              onError: (exception, stackTrace) {},
             ),
             boxShadow: [
               BoxShadow(
@@ -284,4 +285,3 @@ class _RoomCard extends StatelessWidget {
     );
   }
 }
-
